@@ -195,6 +195,9 @@
 ;; use spaces instead of tabs
 (setq-default indent-tabs-mode nil)
 
+(defun gn/search-only-visible-text ()
+  (setq-local search-invisible nil))
+
 ;;; Setup text insepctions
 (use-package flycheck
   :config
@@ -202,6 +205,9 @@
 
   ;; Use the load-path of the current Emacs session for syntax checking
   (setq flycheck-emacs-lisp-load-path 'inherit))
+
+(defun gn/disable-emacs-lisp-flycheck ()
+  (setq flycheck-disabled-checkers '(emacs-lisp emacs-lisp-checkdoc)))
 
 ;; Enable Vertico
 (use-package vertico
@@ -256,6 +262,14 @@
     "TAB" 'yas-insert-snippet)
   :config
   (yas-global-mode 1))
+
+(defun company-mode/backend-with-yas (backend)
+  (if (and (listp backend) (member 'company-yasnippet backend))
+      backend
+    (append (if (consp backend) backend (list backend))
+            '(:with company-yasnippet))))
+
+(setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
 ;; Highlight the matching parenthesis
 (show-paren-mode t)
@@ -476,10 +490,7 @@ If on a:
 (general-def 'n
   "RET" 'gn/test)
 
-(defun gn/disable-emacs-lisp-flycheck ()
-  (setq flycheck-disabled-checkers '(emacs-lisp emacs-lisp-checkdoc)))
-
-(defun gn/fold-lines ()
+(defun gn/org-fold-lines ()
   ;; This needs to be nil on order for 'toggle-truncate-lines' to work.
   (setq truncate-partial-width-windows nil)
 
@@ -491,7 +502,11 @@ If on a:
   :ensure org-contrib
   :general
   (general-def 'n org-mode-map
-    "RET" 'gn-org/dwim-at-point)
+    "RET" 'gn-org/dwim-at-point
+    "M-h" 'org-metaleft
+    "M-H" 'org-promote-subtree
+    "M-l" 'org-metaright
+    "M-L" 'org-demote-subtree)
 
   (general-def 'n org-mode-map
     :prefix gn/leader-key
@@ -505,11 +520,13 @@ If on a:
     "M-q" 'save-buffers-kill-terminal)
   :gfhook 
   #'gn/fold-lines
+  #'gn/search-only-visible-text
   :config
   ;; Adjust indent to heading.
   (setq org-startup-indented t)
 
   ;; Disable flycheck for emacs literate configuration
+
   (general-add-hook 'org-src-mode-hook
                     '(gn/disable-emacs-lisp-flycheck))
 

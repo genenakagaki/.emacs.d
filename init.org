@@ -1,5 +1,6 @@
 #+title: init.el
 #+property: header-args: emacs-lisp :tangle ./init.el :mkdirp yes
+#+startup: show5levels
 
 * Initialization
 This configuration needs to be evaluated first before configuring other stuff.
@@ -143,57 +144,60 @@ Clipboard (copy and paste) configuration
   
 ** Keybinding
 #+begin_src emacs-lisp :tangle yes
-    ;; vim emulation
-    (use-package evil
-      :ensure goto-chg
-      :demand t
-      :init
-      (setq evil-want-integration t)
-      ;; This needs to be nil in order for 'evil-collection' to work
-      (setq evil-want-keybinding nil)
-      :config
-      (evil-mode 1))
+  ;; vim emulation
+  (use-package evil
+    :ensure goto-chg
+    :demand t
+    :init
+    (setq evil-want-integration t)
+    ;; This needs to be nil in order for 'evil-collection' to work
+    (setq evil-want-keybinding nil)
+    :config
+    (evil-mode 1))
 
-    (use-package evil-collection
-      :after evil
-      :config (evil-collection-init))
+  (use-package evil-collection
+    :after evil
+    :config (evil-collection-init))
 
-    ;; Setup keybinding configuration tool
-    (use-package general
-      :after evil
-      :demand t
-      :config
-      (defvar gn/leader-key "SPC")
-      (general-def '(n i)
-        ;; Make similar experience with MacOS
-        "M-a" 'mark-whole-buffer)
-      (general-def 'i 'override
-        ;; Copy
-        "M-c" 'evil-yank
-        ;; Paste 
-        "M-v" 'evil-paste-after))
+  ;; Setup keybinding configuration tool
+  (use-package general
+    :after evil
+    :demand t
+    :config
+    (defvar gn/leader-key "SPC")
+    (general-def 'n 'override
+      "j" 'evil-next-visual-line
+      "k" 'evil-previous-visual-line)
+    (general-def '(n i)
+      ;; Make similar experience with MacOS
+      "M-a" 'mark-whole-buffer)
+    (general-def 'i 'override
+      ;; Copy
+      "M-c" 'evil-yank
+      ;; Paste 
+      "M-v" 'evil-paste-after))
 
-    ;; Enables number increment and decrements
-    (use-package evil-numbers
-      :after general
-      :demand t
-      :general
-      (general-def '(n v)
-        "C-a" 'evil-numbers/inc-at-pt
-        "C-x" 'evil-numbers/dec-at-pt))
+  ;; Enables number increment and decrements
+  (use-package evil-numbers
+    :after general
+    :demand t
+    :general
+    (general-def '(n v)
+      "C-a" 'evil-numbers/inc-at-pt
+      "C-x" 'evil-numbers/dec-at-pt))
 
-    ;; Enables search of highlighted word in visual mode with * key
-    (use-package evil-visualstar
-      :after evil
-      :demand t
-      :config
-      (global-evil-visualstar-mode))
+  ;; Enables search of highlighted word in visual mode with * key
+  (use-package evil-visualstar
+    :after evil
+    :demand t
+    :config
+    (global-evil-visualstar-mode))
 
-    ;; Enables easier surrounding with vim
-    (use-package evil-surround
-      :after evil
-      :demand t
-      :config (global-evil-surround-mode 1))
+  ;; Enables easier surrounding with vim
+  (use-package evil-surround
+    :after evil
+    :demand t
+    :config (global-evil-surround-mode 1))
 
 #+end_src
 
@@ -258,10 +262,14 @@ Hydra
 
 ** Editing
 #+begin_src emacs-lisp :tangle yes
-;;; Setup stuff for editing
+  ;; use spaces instead of tabs
+  (setq-default indent-tabs-mode nil)
+#+end_src
 
-;; use spaces instead of tabs
-(setq-default indent-tabs-mode nil)
+** Searching
+#+begin_src emacs-lisp :tangle yes
+  (defun gn/search-only-visible-text ()
+    (setq-local search-invisible nil))
 #+end_src
 
 ** Inspections
@@ -274,6 +282,12 @@ Hydra
     ;; Use the load-path of the current Emacs session for syntax checking
     (setq flycheck-emacs-lisp-load-path 'inherit))
 
+#+end_src
+
+Functions 
+#+begin_src emacs-lisp :tangle yes
+  (defun gn/disable-emacs-lisp-flycheck ()
+    (setq flycheck-disabled-checkers '(emacs-lisp emacs-lisp-checkdoc)))
 #+end_src
 
 ** Autocompletion
@@ -340,6 +354,17 @@ In-buffer completion
     (yas-global-mode 1))
 #+end_src
 
+Add company autocompletion for yasnippet
+#+begin_src emacs-lisp :tangle yes
+  (defun company-mode/backend-with-yas (backend)
+    (if (and (listp backend) (member 'company-yasnippet backend))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
+
+  (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
+#+end_src
+
 * Modes
 ** Programming Language
 
@@ -389,9 +414,12 @@ In-buffer completion
   (use-package magit
     :general
     (general-def 'n magit-status-mode-map
+      ;; Magit binds the M-w to another command, so change it back to my keybinding
       "M-w" 'kill-current-buffer)
     (general-def 'n with-editor-mode-map
-      "M-w" 'with-editor-cancel)
+      ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
+      "M-w" 'with-editor-cancel
+      "M-RET" 'with-editor-finish)
     (general-def 'n
       :prefix gn/leader-key
       "og" 'magit-status)
@@ -580,23 +608,27 @@ My functions
     "RET" 'gn/test)
 #+end_src
 
+My org-mode functions
 #+begin_src emacs-lisp :tangle yes
-  (defun gn/disable-emacs-lisp-flycheck ()
-    (setq flycheck-disabled-checkers '(emacs-lisp emacs-lisp-checkdoc)))
-
-  (defun gn/fold-lines ()
+  (defun gn/org-fold-lines ()
     ;; This needs to be nil on order for 'toggle-truncate-lines' to work.
     (setq truncate-partial-width-windows nil)
 
     ;; Fold long lines.
     ;; This variable is buffer local, so it needs to be set for every buffer
     (setq truncate-lines nil))
+#+end_src
 
+#+begin_src emacs-lisp :tangle yes
   (use-package org
     :ensure org-contrib
     :general
     (general-def 'n org-mode-map
-      "RET" 'gn-org/dwim-at-point)
+      "RET" 'gn-org/dwim-at-point
+      "M-h" 'org-metaleft
+      "M-H" 'org-promote-subtree
+      "M-l" 'org-metaright
+      "M-L" 'org-demote-subtree)
 
     (general-def 'n org-mode-map
       :prefix gn/leader-key
@@ -610,11 +642,13 @@ My functions
       "M-q" 'save-buffers-kill-terminal)
     :gfhook 
     #'gn/fold-lines
+    #'gn/search-only-visible-text
     :config
     ;; Adjust indent to heading.
     (setq org-startup-indented t)
 
     ;; Disable flycheck for emacs literate configuration
+
     (general-add-hook 'org-src-mode-hook
                       '(gn/disable-emacs-lisp-flycheck))
 
@@ -659,7 +693,7 @@ My functions
 Vim keybinding
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package evil-org
-    :after org
+    :after evil org
     :ghook 'org-mode
     :config
     (require 'evil-org-agenda)

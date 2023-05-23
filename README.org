@@ -1,5 +1,23 @@
 #+title: Readme
 
+* TODO Things to do 
+
+** Make my own dwim command
+
+** Set up org-roam
+
+** Set up blog
+
+** Set up plantUML
+
+** Set up yaml
+
+** Set up Javascript
+
+** Set up HTML
+
+** Set up JSON
+
 * Configuration
 ** Coding
 Follow the emacs-lisp coding convention
@@ -12,6 +30,7 @@ https://github.com/bbatsov/emacs-lisp-style-guide
 ** Adding a new language
 1. Add dependencies by checking the flycheck
    https://www.flycheck.org/en/latest/languages.html#syntax-checker-emacs-lisp
+
 * Usage
 ** Useful commands
 - re-builder :: creates regex interactively
@@ -37,12 +56,20 @@ Example:
  (oak . acorns)
  (maple . seeds))
 #+end_example
+** Which command did I invoke?
+You can check which command you invoked using the =view-lossage= command. 
+* Evil concepts
+** Which evil state am I in?
+You can check the evil state with the =evil-state= variable. I think it gets updated each time a state changes.
 
 * Org concepts 
 ** Source Code
 *** Extract source code into another file 
 You can do this with the =tangle= header arguments
 ** Markup
+** How to use org mode
+*** Editing the TODO state
+Use the =shift= key to change the TODO state and priority
 
 * general.el keybindings
 
@@ -152,9 +179,3 @@ Full example of package installation using use-package
   :delight
   )
 #+end_example
-
-* Configuration Tasks 
-** TODO [#C] Improve flycheck configuration for emacs-lisp   
-Currently emacs-lisp flycheck is completely disabled in my literate Emacs config.
-I can use some of the checkers so I should only disable the ones I don't need
-
