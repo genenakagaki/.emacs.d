@@ -116,6 +116,9 @@
   :demand t
   :config
   (defvar gn/leader-key "SPC")
+  (general-def 'n 'override
+    "j" 'evil-next-visual-line
+    "k" 'evil-previous-visual-line)
   (general-def '(n i)
     ;; Make similar experience with MacOS
     "M-a" 'mark-whole-buffer)
@@ -189,8 +192,6 @@
   "M-s" 'save-buffer
   "M-w" 'kill-current-buffer
   "M-q" 'save-buffers-kill-terminal)
-
-;;; Setup stuff for editing
 
 ;; use spaces instead of tabs
 (setq-default indent-tabs-mode nil)
@@ -289,10 +290,17 @@
     "{" 'paredit-open-curly
     "<" 'paredit-open-angle)
   (general-def 'n paredit-mode-map
-    "M" 'paredit-wrap-square
-    "M-{" 'paredit-wrap-curly
-)
-  :config
+    :prefix gn/leader-key
+    "dw" #'paredit-splice-sexp
+    "s" #'paredit-forward-slurp-sexp
+    "S" #'paredit-backward-slurp-sexp
+    "b" #'paredit-forward-barf-sexp
+    "B" #'paredit-backward-barf-sexp
+    "gl" #'paredit-forward
+    "gh" #'paredit-backward
+    "gj" #'paredit-forward-down
+    "gk" #'paredit-backward-up)
+  :config 
   :diminish nil)
 
 (general-def '(n v) emacs-lisp-mode-map
@@ -307,9 +315,12 @@
 (use-package magit
   :general
   (general-def 'n magit-status-mode-map
+    ;; Magit binds the M-w to another command, so change it back to my keybinding
     "M-w" 'kill-current-buffer)
-  (general-def 'n with-editor-mode-map
-    "M-w" 'with-editor-cancel)
+  (general-def '(n i) with-editor-mode-map
+    ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
+    "M-w" 'with-editor-cancel
+    "M-RET" 'with-editor-finish)
   (general-def 'n
     :prefix gn/leader-key
     "og" 'magit-status)
@@ -467,29 +478,6 @@ If on a:
             (org-element-property :begin context)
             (org-element-property :end context))))))))
 
-(defun gn/test (&optional arg)
-  (interactive "P")
-  (let* ((element (org-element-context))
-         (type (org-element-type element)))
-    )
-
-
-
-  ;; (if (button-at (point))
-  ;;     (call-interactively #'push-button)
-  ;;   (let* ((context (org-element-context))
-  ;;          (type (org-element-type context)))
-  ;;     (print "printing context\n")
-  ;;     (pp context)
-
-  ;;     (print "printing type\n")
-  ;;     (pp type)
-  ;;     ))
-  )
-
-(general-def 'n
-  "RET" 'gn/test)
-
 (defun gn/org-fold-lines ()
   ;; This needs to be nil on order for 'toggle-truncate-lines' to work.
   (setq truncate-partial-width-windows nil)
@@ -500,24 +488,6 @@ If on a:
 
 (use-package org
   :ensure org-contrib
-  :general
-  (general-def 'n org-mode-map
-    "RET" 'gn-org/dwim-at-point
-    "M-h" 'org-metaleft
-    "M-H" 'org-promote-subtree
-    "M-l" 'org-metaright
-    "M-L" 'org-demote-subtree)
-
-  (general-def 'n org-mode-map
-    :prefix gn/leader-key
-    "TAB TAB" 'gn/hydra-org-headline/body)
-
-  (general-def 'n org-src-mode-map
-    "M-o" 'find-file
-    "M-e" 'switch-to-buffer
-    "M-s" 'save-buffer
-    "M-w" 'org-edit-src-abort
-    "M-q" 'save-buffers-kill-terminal)
   :gfhook 
   #'gn/fold-lines
   #'gn/search-only-visible-text
@@ -533,27 +503,19 @@ If on a:
   ;; Hydra for headline navigation and modification
   (defhydra gn/hydra-org-headline (:color pink :hint nil)
     "
-| Navigation^^           | Structure Editing^^              | TODO^^           |
-|------------------------+----------------------------------+------------------|
-| _j_: next headline     | _C-h_: promote subtree           | _t_: toggle TODO |
-| _k_: previous headline | _C-S-h_: promote headline        | ^^               |
-| _h_: parent headline   | _C-l_: demote subtree            | ^^               |
-| ^^                     | _C-S-l_: demote headline         | ^^               |
-| ^^                     | _C-j_: move subtree down | ^^               |
-| ^^                     | _C-k_: move subtree up     | ^^               |
+| Navigation^^           | TODO^^           |
+|------------------------+------------------|
+| _j_: next headline     | _t_: toggle TODO |
+| _k_: previous headline | ^^               |
+| _h_: parent headline   | ^^               |
+| ^^                     | ^^               |
+| ^^                     | ^^               |
+| ^^                     | ^^               |
 "
     ;; Navigation
     ("j" org-next-visible-heading)
     ("k" org-previous-visible-heading)
     ("h" outline-up-heading)
-
-    ;; Heading promotion, demotion
-    ("C-h" org-promote-subtree)
-    ("C-l" org-demote-subtree)
-    ("C-S-h" org-metaleft)
-    ("C-S-l" org-metaright)
-    ("C-j" outline-move-subtree-down)
-    ("C-k" outline-move-subtree-up) 
 
     ;; Todo stuff
     ("J" org-shiftup)
@@ -568,7 +530,7 @@ If on a:
     ))
 
 (use-package evil-org
-  :after org
+  :after evil org
   :ghook 'org-mode
   :config
   (require 'evil-org-agenda)
@@ -576,6 +538,57 @@ If on a:
   (evil-org-agenda-set-keys))
 
 (use-package org-roam
-  :after org)
+  :after org
+
+  :config
+  (setq org-roam-directory "~/org-roam")
+  (setq org-roam-dailies-directory "journal")
+  (setq org-roam-db-location (concat org-roam-directory "/org-roam.db"))
+  (org-roam-db-autosync-mode))
+
+(use-package websocket
+  :after org-roam)
+
+(use-package org-roam-ui
+  :after org-roam ;; or :after org
+  :demand t
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+
+(general-def 'n org-mode-map
+  ;; General org-mode usage
+  "RET" 'gn-org/dwim-at-point
+  "M-h" 'org-metaleft
+  "M-H" 'org-shiftmetaleft
+  "M-l" 'org-metaright
+  "M-L" 'org-shiftmetaright
+
+  ;; insert
+  :prefix gn/leader-key
+  "i" '(:ignore t :which-key "insert")
+  "in" 'org-roam-node-insert
+  "ii" 'org-id-store-link
+  "il" 'org-insert-link
+
+  )
+
+(general-def 'n org-mode-map
+  :prefix gn/leader-key
+  "TAB" '(:ignore t :which-key "Toggle")
+  "TAB TAB" 'gn/hydra-org-headline/body
+  "TAB l" 'org-toggle-link-display
+  "TAB n" #'org-narrow-to-subtree
+  "TAB w" #'widen)
+
+;; Source mode map
+(general-def 'n org-src-mode-map
+  "M-o" 'find-file
+  "M-e" 'switch-to-buffer
+  "M-s" 'save-buffer
+  "M-w" 'org-edit-src-abort
+  "M-q" 'save-buffers-kill-terminal)
 
 (use-package plantuml-mode)
