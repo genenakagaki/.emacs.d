@@ -186,7 +186,7 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(general-def 'n
+(general-def 'n 
   "M-o" 'find-file
   "M-e" 'switch-to-buffer
   "M-s" 'save-buffer
@@ -321,7 +321,7 @@
     ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
     "M-w" 'with-editor-cancel
     "M-RET" 'with-editor-finish)
-  (general-def 'n
+  (general-def 'n 'override
     :prefix gn/leader-key
     "og" 'magit-status)
   :config

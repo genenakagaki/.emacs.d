@@ -252,7 +252,7 @@ Hydra
 
 ** File manipulation
 #+begin_src emacs-lisp :tangle yes
-  (general-def 'n
+  (general-def 'n 
     "M-o" 'find-file
     "M-e" 'switch-to-buffer
     "M-s" 'save-buffer
@@ -427,7 +427,7 @@ Add company autocompletion for yasnippet
       ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
       "M-w" 'with-editor-cancel
       "M-RET" 'with-editor-finish)
-    (general-def 'n
+    (general-def 'n 'override
       :prefix gn/leader-key
       "og" 'magit-status)
     :config
