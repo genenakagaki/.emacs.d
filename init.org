@@ -23,6 +23,8 @@ Change working directory to the emacs config directory
   (menu-bar-mode -1)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
+
+  (setq confirm-kill-emacs 'yes-or-no-p)
 #+end_src
 
 ** Backups
@@ -76,34 +78,37 @@ The use-package macro allows you to isolate package configuration in your .emacs
 #+end_quote
 
 #+begin_src emacs-lisp :tangle yes
-;;; Setup package configuration with 'use-package'.
-(unless (package-installed-p 'use-package)
-    (package-install 'use-package))
+  ;;; Setup package configuration with 'use-package'.
+  (unless (package-installed-p 'use-package)
+      (package-install 'use-package))
 
-(require 'use-package)
+  (require 'use-package)
 
-;; logs stuff that takes long, and handles package configuration errors.
-;;
-;; logs stuff that takes long in the `*Messages*' buffer in the following conditions:
-;; - package takes longer than 0.1s to load
-;; - `:config' blocks takes longer than 0.1s to execute
-;;
-;; handles package configuration errors by:
-;; - Emacs will not stop loading on error
-;; - errors will be reported in a "*Warnings* popup buffer
-(setq use-package-verbose t)
+  ;; logs stuff that takes long, and handles package configuration errors.
+  ;;
+  ;; logs stuff that takes long in the `*Messages*' buffer in the following conditions:
+  ;; - package takes longer than 0.1s to load
+  ;; - `:config' blocks takes longer than 0.1s to execute
+  ;;
+  ;; handles package configuration errors by:
+  ;; - Emacs will not stop loading on error
+  ;; - errors will be reported in a "*Warnings* popup buffer
+  (setq use-package-verbose t)
 
-;; Install packages automatically if not already present on the system.
-(require 'use-package-ensure)
-(setq use-package-always-ensure t)
+  ;; Install packages automatically if not already present on the system.
+  (require 'use-package-ensure)
+  (setq use-package-always-ensure t)
 
-;; prevent appending "-hook" on `:hook' keyword
-(setq use-package-hook-name-suffix nil)
+  ;; Always load package 
+  (setq use-package-always-demand t)
 
-;; show how many packages were loaded, what stage of initialization they've reached, and how much aggregate time they've spent (roughly)
-(setq use-package-compute-statistics t)
+  ;; prevent appending "-hook" on `:hook' keyword
+  (setq use-package-hook-name-suffix nil)
 
-(use-package use-package-ensure-system-package)
+  ;; show how many packages were loaded, what stage of initialization they've reached, and how much aggregate time they've spent (roughly)
+  (setq use-package-compute-statistics t)
+
+  (use-package use-package-ensure-system-package)
 #+end_src
 
 ** MacOS Configuration
@@ -142,12 +147,13 @@ Clipboard (copy and paste) configuration
 
 * Editor
   
-** Keybinding
+** Keybinding Initialization
+
+Vim emulation
 #+begin_src emacs-lisp :tangle yes
   ;; vim emulation
   (use-package evil
-    :ensure goto-chg
-    :demand t
+    :after goto-chg
     :init
     (setq evil-want-integration t)
     ;; This needs to be nil in order for 'evil-collection' to work
@@ -155,80 +161,81 @@ Clipboard (copy and paste) configuration
     :config
     (evil-mode 1))
 
+  (use-package goto-chg)
+
   (use-package evil-collection
     :after evil
     :config (evil-collection-init))
 
   ;; Setup keybinding configuration tool
   (use-package general
-    :after evil
-    :demand t
-    :config
-    (defvar gn/leader-key "SPC")
-    (general-def 'n 'override
-      "j" 'evil-next-visual-line
-      "k" 'evil-previous-visual-line)
-    (general-def '(n i)
-      ;; Make similar experience with MacOS
-      "M-a" 'mark-whole-buffer)
-    (general-def 'i 'override
-      ;; Copy
-      "M-c" 'evil-yank
-      ;; Paste 
-      "M-v" 'evil-paste-after))
+    :after evil)
 
   ;; Enables number increment and decrements
   (use-package evil-numbers
-    :after general
-    :demand t
-    :general
-    (general-def '(n v)
-      "C-a" 'evil-numbers/inc-at-pt
-      "C-x" 'evil-numbers/dec-at-pt))
+    :after (evil general))
 
   ;; Enables search of highlighted word in visual mode with * key
   (use-package evil-visualstar
     :after evil
-    :demand t
     :config
     (global-evil-visualstar-mode))
 
   ;; Enables easier surrounding with vim
   (use-package evil-surround
     :after evil
-    :demand t
     :config (global-evil-surround-mode 1))
-
 #+end_src
 
 Avy
 #+begin_src emacs-lisp :tangle yes
   (use-package avy
-    :after evil
-    :general
-    (general-def '(n m)
-      "s" 'avy-goto-char-2))
+    :after evil)
 #+end_src
 
 Show keybindings in minibuffer
 #+begin_src emacs-lisp :tangle yes
   (use-package which-key
-    :demand t
     :config
     (which-key-mode))
 #+end_src
 
 Hydra
 #+begin_src emacs-lisp :tangle yes
-  (use-package hydra
-    :demand t)
+  (use-package hydra)
 #+end_src
+
+Keybindings
+#+begin_src emacs-lisp :tangle yes
+  (defvar gn/leader-key "SPC")
+
+  (general-def 'n 'override
+    "j" 'evil-next-visual-line
+    "k" 'evil-previous-visual-line)
+
+  (general-def '(n i)
+    ;; Make similar experience with MacOS
+    "M-a" 'mark-whole-buffer)
+
+  (general-def 'i 'override
+    ;; Copy
+    "M-c" 'evil-yank
+    ;; Paste 
+    "M-v" 'evil-paste-after)
+
+  (general-def '(n v)
+    "C-a" 'evil-numbers/inc-at-pt
+    "C-x" 'evil-numbers/dec-at-pt)
+  
+  (general-def '(n m)
+    "s" 'avy-goto-char-2)
+#+end_src
+
 
 ** UI Theme
 #+begin_src emacs-lisp :tangle yes
   ;;; Appearance
   (use-package doom-themes
-    :demand t
     :config
     (setq
      doom-themes-enable-bold t
@@ -336,7 +343,6 @@ Functions
 In-buffer completion
 #+begin_src emacs-lisp :tangle yes
   (use-package company
-    :demand t
     :config
     (global-company-mode t))
 #+end_src
@@ -345,7 +351,6 @@ In-buffer completion
 ** Templating
 #+begin_src emacs-lisp :tangle yes
   (use-package yasnippet
-    :demand t
     :ensure yasnippet-snippets
     :general
     (general-def 'i 
@@ -374,7 +379,7 @@ Add company autocompletion for yasnippet
 
   ;; Color the brackets 
   (use-package rainbow-delimiters
-    :ghook ('prog-mode-hook #'rainbow-delimiters-mode))
+    :ghook 'prog-mode-hook)
 
   ;; Adds easier shortcut for editing Lisp. 
   (use-package paredit
@@ -402,9 +407,7 @@ Add company autocompletion for yasnippet
 #+end_src
 
 
-*** Lisp 
-
-**** Emacs Lisp 
+*** Emacs Lisp 
 #+begin_src emacs-lisp :tangle yes
   (general-def '(n v) emacs-lisp-mode-map
     "M-/" 'comment-dwim)
@@ -416,22 +419,34 @@ Add company autocompletion for yasnippet
     "M-RET" 'eval-region)
 #+end_src
 
+*** Clojure
+#+begin_src emacs-lisp :tangle yes
+  (use-package cider
+    :ghook
+    'clojure-mode-hook
+    'clojurescript-mode-hook)
+
+  (general-def 'n clojure-mode-map
+    "M-RET" 'cider-eval-last-sexp)
+
+  (general-def '(n i) clojure-mode-map
+    "M-RET" 'cider-eval-defun-at-point)
+#+end_src
+
 ** Git client (Magit)
 #+begin_src emacs-lisp :tangle yes
   (use-package magit
-    :general
-    (general-def 'n magit-status-mode-map
-      ;; Magit binds the M-w to another command, so change it back to my keybinding
-      "M-w" 'kill-current-buffer)
-    (general-def '(n i) with-editor-mode-map
-      ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
-      "M-w" 'with-editor-cancel
-      "M-RET" 'with-editor-finish)
-    (general-def 'n 'override
-      :prefix gn/leader-key
-      "og" 'magit-status)
     :config
     (setq magit-refresh-status-buffer nil))
+
+  (general-def 'n magit-status-mode-map
+    ;; Magit binds the M-w to another command, so change it back to my keybinding
+    "M-w" 'kill-current-buffer)
+
+  (general-def '(n i) with-editor-mode-map
+    ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
+    "M-w" 'with-editor-cancel
+    "M-RET" 'with-editor-finish)
 #+end_src
 
 ** Org mode
@@ -605,54 +620,29 @@ My org-mode functions
 
 #+begin_src emacs-lisp :tangle yes
   (use-package org
-    :ensure org-contrib
     :gfhook 
-    #'gn/fold-lines
+    #'gn/org-fold-lines
     #'gn/search-only-visible-text
     :config
     ;; Adjust indent to heading.
     (setq org-startup-indented t)
 
-    ;; Disable flycheck for emacs literate configuration
+    ;; Set org-roam directory
+    (setq org-directory "~/org-roam/")
 
+    ;; Disable flycheck for emacs literate configuration
     (general-add-hook 'org-src-mode-hook
                       '(gn/disable-emacs-lisp-flycheck))
 
     ;; Hydra for headline navigation and modification
-    (defhydra gn/hydra-org-headline (:color pink :hint nil)
-      "
-  | Navigation^^           | TODO^^           |
-  |------------------------+------------------|
-  | _j_: next headline     | _t_: toggle TODO |
-  | _k_: previous headline | ^^               |
-  | _h_: parent headline   | ^^               |
-  | ^^                     | ^^               |
-  | ^^                     | ^^               |
-  | ^^                     | ^^               |
-  "
-      ;; Navigation
-      ("j" org-next-visible-heading)
-      ("k" org-previous-visible-heading)
-      ("h" outline-up-heading)
-
-      ;; Todo stuff
-      ("J" org-shiftup)
-      ("K" org-shiftdown)
-      ("H" org-shiftleft)
-      ("L" org-shiftright)
-      ("t" org-todo)
-
-      ;; Quit
-      ("q" nil "quit")
-      ("<escape>" nil "quit")
-      ))
+    )
 #+end_src
 
 Vim keybinding
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package evil-org
     :after evil org
-    :ghook 'org-mode
+    :ghook 'org-mode-hook
     :config
     (require 'evil-org-agenda)
     (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
@@ -663,7 +653,6 @@ Org-roam
 #+begin_src emacs-lisp :tangle yes
   (use-package org-roam
     :after org
-  
     :config
     (setq org-roam-directory "~/org-roam")
     (setq org-roam-dailies-directory "journal")
@@ -675,7 +664,6 @@ Org-roam
 
   (use-package org-roam-ui
     :after org-roam ;; or :after org
-    :demand t
     :config
     (setq org-roam-ui-sync-theme t
           org-roam-ui-follow t
@@ -685,25 +673,49 @@ Org-roam
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
+  (defhydra gn/hydra-org-headline (:color pink :hint nil)
+    "
+  | Navigation^^           | TODO^^           |
+  |------------------------+------------------|
+  | _j_: next headline     |  |
+  | _k_: previous headline | ^^               |
+  | _h_: parent headline   | ^^               |
+  | ^^                     | ^^               |
+  | ^^                     | ^^               |
+  | ^^                     | ^^               |
+  "
+    ;; Navigation
+    ("j" org-next-visible-heading)
+    ("k" org-previous-visible-heading)
+    ("h" outline-up-heading)
+
+    ;; Todo stuff
+    ("J" org-shiftup)
+    ("K" org-shiftdown)
+    ("H" org-shiftleft)
+    ("L" org-shiftright)
+
+    ;; Quit
+    ("q" nil "quit")
+    ("<escape>" nil "quit"))
+
   (general-def 'n org-mode-map
     ;; General org-mode usage
     "RET" 'gn-org/dwim-at-point
     "M-h" 'org-metaleft
     "M-H" 'org-shiftmetaleft
     "M-l" 'org-metaright
-    "M-L" 'org-shiftmetaright
+    "M-L" 'org-shiftmetaright)
 
-    ;; insert
+  (general-def 'n org-mode-map
     :prefix gn/leader-key
+    ;; insert
     "i" '(:ignore t :which-key "insert")
     "in" 'org-roam-node-insert
     "ii" 'org-id-store-link
     "il" 'org-insert-link
 
-    )
-
-  (general-def 'n org-mode-map
-    :prefix gn/leader-key
+    ;; toggle
     "TAB" '(:ignore t :which-key "Toggle")
     "TAB TAB" 'gn/hydra-org-headline/body
     "TAB l" 'org-toggle-link-display
@@ -724,6 +736,37 @@ Org-roam
   (use-package plantuml-mode)
 #+end_src
 
+* Leader Keybindings
+#+begin_src emacs-lisp :tangle yes
+  (general-def 'n 'override
+    :prefix gn/leader-key
+
+    "o" '(:ignore t :wk "Open")
+    "og" 'magit-status
+    "on" '(org-roam-node-find :wk "Org roam node")
+    "or" '(org-roam-graph :wk "Org roam graph")
+
+    "i" '(:ignore t :wk "Insert")
+    "is" '(yas-insert-snippet :wk "Insert snippet")
+
+    "TAB" '(:ignore t :wk "Toggle")
+
+    ";" '(pp-eval-expression :wk "Eval expression")
+  )
+
+  (general-def 'n org-mode-map
+    "i" '(:ignore t :wk "Insert")
+    "in" '(org-roam-node-insert :wk "Insert org roam node")
+    "ii" '(org-id-store-link :wk "Insert ID"))
+
+  (general-def 'n paredit-mode-map
+    :prefix gn/leader-key
+    "s" #'paredit-forward-slurp-sexp
+    "S" #'paredit-backward-slurp-sexp
+    "b" #'paredit-forward-barf-sexp
+    "B" #'paredit-backward-barf-sexp)
+
+#+end_src
 
 * Configuration for Literate Emacs Config
 

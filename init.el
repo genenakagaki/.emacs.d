@@ -8,6 +8,8 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+(setq confirm-kill-emacs 'yes-or-no-p)
+
 ;;; Setup how backup behaves.
 
 ;; Write backups in a specified folder
@@ -63,6 +65,9 @@
 (require 'use-package-ensure)
 (setq use-package-always-ensure t)
 
+;; Always load package 
+(setq use-package-always-demand t)
+
 ;; prevent appending "-hook" on `:hook' keyword
 (setq use-package-hook-name-suffix nil)
 
@@ -97,8 +102,7 @@
 
 ;; vim emulation
 (use-package evil
-  :ensure goto-chg
-  :demand t
+  :after goto-chg
   :init
   (setq evil-want-integration t)
   ;; This needs to be nil in order for 'evil-collection' to work
@@ -106,67 +110,65 @@
   :config
   (evil-mode 1))
 
+(use-package goto-chg)
+
 (use-package evil-collection
   :after evil
   :config (evil-collection-init))
 
 ;; Setup keybinding configuration tool
 (use-package general
-  :after evil
-  :demand t
-  :config
-  (defvar gn/leader-key "SPC")
-  (general-def 'n 'override
-    "j" 'evil-next-visual-line
-    "k" 'evil-previous-visual-line)
-  (general-def '(n i)
-    ;; Make similar experience with MacOS
-    "M-a" 'mark-whole-buffer)
-  (general-def 'i 'override
-    ;; Copy
-    "M-c" 'evil-yank
-    ;; Paste 
-    "M-v" 'evil-paste-after))
+  :after evil)
 
 ;; Enables number increment and decrements
 (use-package evil-numbers
-  :after general
-  :demand t
-  :general
-  (general-def '(n v)
-    "C-a" 'evil-numbers/inc-at-pt
-    "C-x" 'evil-numbers/dec-at-pt))
+  :after (evil general))
 
 ;; Enables search of highlighted word in visual mode with * key
 (use-package evil-visualstar
   :after evil
-  :demand t
   :config
   (global-evil-visualstar-mode))
 
 ;; Enables easier surrounding with vim
 (use-package evil-surround
   :after evil
-  :demand t
   :config (global-evil-surround-mode 1))
 
 (use-package avy
-  :after evil
-  :general
-  (general-def '(n m)
-    "s" 'avy-goto-char-2))
+  :after evil)
 
 (use-package which-key
-  :demand t
   :config
   (which-key-mode))
 
-(use-package hydra
-  :demand t)
+(use-package hydra)
+
+(defvar gn/leader-key "SPC")
+
+(general-def 'n 'override
+  "j" 'evil-next-visual-line
+  "k" 'evil-previous-visual-line)
+
+(general-def '(n i)
+  ;; Make similar experience with MacOS
+  "M-a" 'mark-whole-buffer)
+
+(general-def 'i 'override
+  ;; Copy
+  "M-c" 'evil-yank
+  ;; Paste 
+  "M-v" 'evil-paste-after)
+
+(general-def '(n v)
+  "C-a" 'evil-numbers/inc-at-pt
+  "C-x" 'evil-numbers/dec-at-pt)
+
+(general-def '(n m)
+  "s" 'avy-goto-char-2)
 
 ;;; Appearance
 (use-package doom-themes
-  :demand t
   :config
   (setq
    doom-themes-enable-bold t
@@ -251,12 +253,10 @@
   (marginalia-mode))
 
 (use-package company
-  :demand t
   :config
   (global-company-mode t))
 
 (use-package yasnippet
-  :demand t
   :ensure yasnippet-snippets
   :general
   (general-def 'i 
@@ -277,7 +277,7 @@
 
 ;; Color the brackets 
 (use-package rainbow-delimiters
-  :ghook ('prog-mode-hook #'rainbow-delimiters-mode))
+  :ghook 'prog-mode-hook)
 
 ;; Adds easier shortcut for editing Lisp. 
 (use-package paredit
@@ -312,20 +312,29 @@
 (general-def 'v emacs-lisp-mode-map
   "M-RET" 'eval-region)
 
+(use-package cider
+  :ghook
+  'clojure-mode-hook
+  'clojurescript-mode-hook)
+
+(general-def 'n clojure-mode-map
+  "M-RET" 'cider-eval-last-sexp)
+
+(general-def '(n i) clojure-mode-map
+  "M-RET" 'cider-eval-defun-at-point)
+
 (use-package magit
-  :general
-  (general-def 'n magit-status-mode-map
-    ;; Magit binds the M-w to another command, so change it back to my keybinding
-    "M-w" 'kill-current-buffer)
-  (general-def '(n i) with-editor-mode-map
-    ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
-    "M-w" 'with-editor-cancel
-    "M-RET" 'with-editor-finish)
-  (general-def 'n 'override
-    :prefix gn/leader-key
-    "og" 'magit-status)
   :config
   (setq magit-refresh-status-buffer nil))
+
+(general-def 'n magit-status-mode-map
+  ;; Magit binds the M-w to another command, so change it back to my keybinding
+  "M-w" 'kill-current-buffer)
+
+(general-def '(n i) with-editor-mode-map
+  ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
+  "M-w" 'with-editor-cancel
+  "M-RET" 'with-editor-finish)
 
 (defun yas/org-very-safe-expand ()
   (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
@@ -487,51 +496,26 @@ If on a:
   (setq truncate-lines nil))
 
 (use-package org
-  :ensure org-contrib
   :gfhook 
-  #'gn/fold-lines
+  #'gn/org-fold-lines
   #'gn/search-only-visible-text
   :config
   ;; Adjust indent to heading.
   (setq org-startup-indented t)
 
-  ;; Disable flycheck for emacs literate configuration
+  ;; Set org-roam directory
+  (setq org-directory "~/org-roam/")
 
+  ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook
                     '(gn/disable-emacs-lisp-flycheck))
 
   ;; Hydra for headline navigation and modification
-  (defhydra gn/hydra-org-headline (:color pink :hint nil)
-    "
-| Navigation^^           | TODO^^           |
-|------------------------+------------------|
-| _j_: next headline     | _t_: toggle TODO |
-| _k_: previous headline | ^^               |
-| _h_: parent headline   | ^^               |
-| ^^                     | ^^               |
-| ^^                     | ^^               |
-| ^^                     | ^^               |
-"
-    ;; Navigation
-    ("j" org-next-visible-heading)
-    ("k" org-previous-visible-heading)
-    ("h" outline-up-heading)
-
-    ;; Todo stuff
-    ("J" org-shiftup)
-    ("K" org-shiftdown)
-    ("H" org-shiftleft)
-    ("L" org-shiftright)
-    ("t" org-todo)
-
-    ;; Quit
-    ("q" nil "quit")
-    ("<escape>" nil "quit")
-    ))
+  )
 
 (use-package evil-org
   :after evil org
-  :ghook 'org-mode
+  :ghook 'org-mode-hook
   :config
   (require 'evil-org-agenda)
   (evil-org-set-key-theme '(navigation insert textobjects additional calendar))
@@ -539,7 +523,6 @@ If on a:
 
 (use-package org-roam
   :after org
-
   :config
   (setq org-roam-directory "~/org-roam")
   (setq org-roam-dailies-directory "journal")
@@ -551,12 +534,37 @@ If on a:
 
 (use-package org-roam-ui
   :after org-roam ;; or :after org
-  :demand t
   :config
   (setq org-roam-ui-sync-theme t
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
+
+(defhydra gn/hydra-org-headline (:color pink :hint nil)
+  "
+| Navigation^^           | TODO^^           |
+|------------------------+------------------|
+| _j_: next headline     |  |
+| _k_: previous headline | ^^               |
+| _h_: parent headline   | ^^               |
+| ^^                     | ^^               |
+| ^^                     | ^^               |
+| ^^                     | ^^               |
+"
+  ;; Navigation
+  ("j" org-next-visible-heading)
+  ("k" org-previous-visible-heading)
+  ("h" outline-up-heading)
+
+  ;; Todo stuff
+  ("J" org-shiftup)
+  ("K" org-shiftdown)
+  ("H" org-shiftleft)
+  ("L" org-shiftright)
+
+  ;; Quit
+  ("q" nil "quit")
+  ("<escape>" nil "quit"))
 
 (general-def 'n org-mode-map
   ;; General org-mode usage
@@ -564,19 +572,17 @@ If on a:
   "M-h" 'org-metaleft
   "M-H" 'org-shiftmetaleft
   "M-l" 'org-metaright
-  "M-L" 'org-shiftmetaright
+  "M-L" 'org-shiftmetaright)
 
-  ;; insert
+(general-def 'n org-mode-map
   :prefix gn/leader-key
+  ;; insert
   "i" '(:ignore t :which-key "insert")
   "in" 'org-roam-node-insert
   "ii" 'org-id-store-link
   "il" 'org-insert-link
 
-  )
-
-(general-def 'n org-mode-map
-  :prefix gn/leader-key
+  ;; toggle
   "TAB" '(:ignore t :which-key "Toggle")
   "TAB TAB" 'gn/hydra-org-headline/body
   "TAB l" 'org-toggle-link-display
@@ -592,3 +598,31 @@ If on a:
   "M-q" 'save-buffers-kill-terminal)
 
 (use-package plantuml-mode)
+
+(general-def 'n 'override
+  :prefix gn/leader-key
+
+  "o" '(:ignore t :wk "Open")
+  "og" 'magit-status
+  "on" '(org-roam-node-find :wk "Org roam node")
+  "or" '(org-roam-graph :wk "Org roam graph")
+
+  "i" '(:ignore t :wk "Insert")
+  "is" '(yas-insert-snippet :wk "Insert snippet")
+
+  "TAB" '(:ignore t :wk "Toggle")
+
+  ";" '(pp-eval-expression :wk "Eval expression")
+)
+
+(general-def 'n org-mode-map
+  "i" '(:ignore t :wk "Insert")
+  "in" '(org-roam-node-insert :wk "Insert org roam node")
+  "ii" '(org-id-store-link :wk "Insert ID"))
+
+(general-def 'n paredit-mode-map
+  :prefix gn/leader-key
+  "s" #'paredit-forward-slurp-sexp
+  "S" #'paredit-backward-slurp-sexp
+  "b" #'paredit-forward-barf-sexp
+  "B" #'paredit-backward-barf-sexp)
