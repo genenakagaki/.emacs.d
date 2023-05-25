@@ -1,5 +1,9 @@
 (cd user-emacs-directory)
 
+;; Setup user
+(setq user-full-name "Gene Nakagaki"
+      user-mail-address "gene.nakagaki@gmail.com")
+
 ;; Prevent startup message from showing up
 (setq inhibit-startup-message t)
 
@@ -347,6 +351,11 @@ This functions should be added to the 'org-mode-hook'."
   (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
   (define-key yas/keymap [tab] 'yas/next-field))
 
+(defun gn/open-task-inbox ()
+  "Opens the task inbox file. This is where you put all the tasks."
+  (interactive)
+  (find-file (concat org-roam-directory "/todo.org")))
+
 ;;;###autoload
 (defun gn-org/dwim-at-point (&optional arg)
   "Do-what-I-mean at point.
@@ -510,8 +519,16 @@ If on a:
   (general-add-hook 'org-src-mode-hook
                     '(gn/disable-emacs-lisp-flycheck))
 
-  ;; Hydra for headline navigation and modification
-  )
+  (setq org-todo-keywords
+        '((sequence "TODO(t)" "DOING" "|" "DONE" "CANCELLED(c)")
+          (sequence "WAITING(w!)" "|" "DONE")
+          (sequence "DELEGATED(d)" "|" "DONE")
+          ))
+  (setq org-todo-keyword-faces
+        '(("TODO" . "#f1d1a2")
+          ("WAITING" . "#da8548")
+          ("DELEGATED" . "#da8548")
+          )))
 
 (use-package evil-org
   :after evil org
@@ -574,21 +591,6 @@ If on a:
   "M-l" 'org-metaright
   "M-L" 'org-shiftmetaright)
 
-(general-def 'n org-mode-map
-  :prefix gn/leader-key
-  ;; insert
-  "i" '(:ignore t :which-key "insert")
-  "in" 'org-roam-node-insert
-  "ii" 'org-id-store-link
-  "il" 'org-insert-link
-
-  ;; toggle
-  "TAB" '(:ignore t :which-key "Toggle")
-  "TAB TAB" 'gn/hydra-org-headline/body
-  "TAB l" 'org-toggle-link-display
-  "TAB n" #'org-narrow-to-subtree
-  "TAB w" #'widen)
-
 ;; Source mode map
 (general-def 'n org-src-mode-map
   "M-o" 'find-file
@@ -606,6 +608,7 @@ If on a:
   "og" 'magit-status
   "on" '(org-roam-node-find :wk "Org roam node")
   "or" '(org-roam-graph :wk "Org roam graph")
+  "ot" '(gn/open-task-inbox :wk "Task inbox")
 
   "i" '(:ignore t :wk "Insert")
   "is" '(yas-insert-snippet :wk "Insert snippet")
@@ -613,12 +616,20 @@ If on a:
   "TAB" '(:ignore t :wk "Toggle")
 
   ";" '(pp-eval-expression :wk "Eval expression")
-)
+  )
 
 (general-def 'n org-mode-map
-  "i" '(:ignore t :wk "Insert")
-  "in" '(org-roam-node-insert :wk "Insert org roam node")
-  "ii" '(org-id-store-link :wk "Insert ID"))
+  :prefix gn/leader-key
+  ;; Insert
+  "in" '(org-roam-node-insert :wk "Org roam node")
+  "ii" '(org-id-store-link :wk "Insert ID")
+  "il" '(org-insert-link :wk "Insert link")
+
+  ;; Toggle
+  "TAB TAB" 'gn/hydra-org-headline/body
+  "TAB l" 'org-toggle-link-display
+  "TAB n" #'org-narrow-to-subtree
+  "TAB w" #'widen)
 
 (general-def 'n paredit-mode-map
   :prefix gn/leader-key
