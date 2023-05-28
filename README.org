@@ -2,8 +2,6 @@
 
 * TODO Things to do 
 
-** Make my own dwim command
-
 ** Set up org-roam
 
 ** Set up blog
@@ -58,6 +56,8 @@ Example:
 #+end_example
 ** Which command did I invoke?
 You can check which command you invoked using the =view-lossage= command. 
+
+** Interactive functions
 * Evil concepts
 ** Which evil state am I in?
 You can check the evil state with the =evil-state= variable. I think it gets updated each time a state changes.
@@ -70,6 +70,8 @@ You can do this with the =tangle= header arguments
 ** How to use org mode
 *** Editing the TODO state
 Use the =shift= key to change the TODO state and priority
+** Org syntax API
+https://orgmode.org/worg/dev/org-element-api.html
 
 * general.el keybindings
 
