@@ -492,9 +492,7 @@ My functions
       (pcase (-first-item element)
         ('paragraph (let* ((parent (org-element-property :parent paragraph)))
                       (message "at paragraph")
-                      ))
-      )
-    )
+                      )))))
 #+end_src
 
 My org-mode functions
@@ -549,14 +547,6 @@ Vim keybinding
 
 Org-roam
 #+begin_src emacs-lisp :tangle yes
-  (cl-defmethod org-roam-node-gn-node-display ((node org-roam-node))
-    "Method used to display the org-roam node in the minibuffer."
-    (let ((title (org-roam-node-title node))
-          (file-title (org-roam-node-file-title node)))
-      (if (string= title file-title)
-          title
-        (concat file-title ": " title))))
-
   (use-package org-roam
     :after org
     :config
@@ -565,6 +555,14 @@ Org-roam
     (setq org-roam-db-location (concat org-roam-directory "/org-roam.db"))
     (org-roam-db-autosync-mode)
     (setq org-roam-node-display-template "${gn-node-display}"))
+
+  (cl-defmethod org-roam-node-gn-node-display ((node org-roam-node))
+    "Method used to display the org-roam node in the minibuffer."
+    (let ((title (org-roam-node-title node))
+          (file-title (org-roam-node-file-title node)))
+      (if (string= title file-title)
+          title
+        (concat file-title ": " title))))
 
   (use-package websocket
     :after org-roam)
@@ -625,10 +623,54 @@ Org-roam
 
 ** PlantUML
 #+begin_src emacs-lisp :tangle yes
+  (use-package request)
+
+  (defun gn/plantuml-encode (plantuml-code)
+    "Encodes PLANTUML-CODE to a string that can be used to generate PlantUML diagrams."
+    (let* ((request-url (concat plantuml-server-url "/coder"))
+           (response (request request-url
+                       :sync t
+                       :type "POST"
+                       :data plantuml-code
+                       :headers '(("Content-Type" . "text/plain")))))
+      (message (request-response-data response))
+      (request-response-data response)))
+
+  (defun gn/plantuml-generate-diagram (encoded-plantuml-code)
+    "Generates PlanUML diagram from ENCODED-PLANUML-CODE."
+    (let* ((request-url (concat plantuml-server-url "/" plantuml-output-type "/" encoded-plantuml-code))
+           (response (request request-url
+                       :sync t
+                       :type "GET")))
+      (request-response-data response)))
+
   (use-package plantuml-mode
     :config
+    (setq plantuml-server-url "http://localhost:8080")
+    (setq plantuml-exec-mode 'server)
+    (setq plantuml-output-type "png")
+
     (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-    )
+
+    ;; (url-retrieve url-request-location
+    ;;               (lambda (status)
+    ;;                 ;; TODO: error check
+    ;;                 (goto-char (point-min))
+    ;;                 ;; skip the HTTP headers
+    ;;                 (while (not (looking-at "\n"))
+    ;;                   (forward-line))
+    ;;                 (kill-region (point-min) (+ 1 (point)))
+    ;;                 (copy-to-buffer buf (point-min) (point-max))
+    ;;                 (plantuml-update-preview-buffer prefix buf)))
+
+    ;; Fix broken preview using server mode
+    (advice-add
+     'plantuml-server-encode-url :override
+     (lambda (string)
+       (let* ((encoded-string (gn/plantuml-encode string)))
+         (concat plantuml-server-url "/" plantuml-output-type "/" encoded-string)))))
+
+
 #+end_src
 
 ** YAML
