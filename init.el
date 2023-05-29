@@ -424,7 +424,31 @@ This functions should be added to the 'org-mode-hook'."
   (setq org-roam-dailies-directory "journal")
   (setq org-roam-db-location (concat org-roam-directory "/org-roam.db"))
   (org-roam-db-autosync-mode)
-  (setq org-roam-node-display-template "${gn-node-display}"))
+  (setq org-roam-node-display-template "${gn-node-display}")
+
+  (setq org-roam-capture-templates
+        '(("d" "default"
+            plain "%?"
+            :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+                               "
+#+language: en
+#+title: ${title}
+
+* {{{title}}}")
+            :immediate-finish
+            :jump-to-captured)))
+
+  (setq org-roam-dailies-capture-templates
+        '(("d" "default"
+           entry "* %?"
+           :target (file+head "%<%Y-%m-%d>.org"
+                              "
+#+language: en
+#+title: %<%Y-%m-%d>
+")
+           :immediate-finish
+           :jump-to-captured))))
+
 
 (cl-defmethod org-roam-node-gn-node-display ((node org-roam-node))
   "Method used to display the org-roam node in the minibuffer."
@@ -444,6 +468,14 @@ This functions should be added to the 'org-mode-hook'."
         org-roam-ui-follow t
         org-roam-ui-update-on-save t
         org-roam-ui-open-on-start t))
+
+(defun gn/orgroam-force-rebuild-cache ()
+  "Rebuild the `org-mode' and `org-roam' cache."
+  (interactive)
+  (org-id-update-id-locations)
+  (org-roam-db-clear-all)
+  (org-roam-db-sync)
+  (org-roam-update-org-id-locations))
 
 (defhydra gn/hydra-org-headline (:color pink :hint nil)
   "

@@ -8,6 +8,12 @@
 
 ** Set up plantUML
 
+** Set up image preview thing
+Preview images on the browser
+Use browser sync
+Make a html page that just shows the image,
+When you want to render the image, just change the image url
+
 ** Set up yaml
 
 ** Set up Javascript
