@@ -108,9 +108,13 @@
 (use-package evil
   :after goto-chg
   :init
-  (setq evil-want-integration t)
-  ;; This needs to be nil in order for 'evil-collection' to work
-  (setq evil-want-keybinding nil)
+  (setq
+   evil-want-integration t
+   ;; This needs to be nil in order for 'evil-collection' to work
+   evil-want-keybinding nil
+   ;; Setup undo system 
+   evil-undo-system 'undo-redo
+   )
   :config
   (evil-mode 1))
 
@@ -388,11 +392,15 @@ This functions should be added to the 'org-mode-hook'."
   #'gn/org-fold-lines
   #'gn/search-only-visible-text
   :config
-  ;; Adjust indent to heading.
-  (setq org-startup-indented t)
+  (setq
+   ;; Adjust indent to heading.
+   org-startup-indented t
 
-  ;; Set org-roam directory
-  (setq org-directory "~/org-roam/")
+   ;; Set org-roam directory
+   org-directory "~/org-roam/"
+
+   ;; Open src window in current window
+   org-src-window-setup "current-window")
 
   ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook
@@ -419,10 +427,11 @@ This functions should be added to the 'org-mode-hook'."
 
 (use-package org-roam
   :after org
-  :config
+  :init
   (setq org-roam-directory "~/org-roam")
-  (setq org-roam-dailies-directory "journal")
   (setq org-roam-db-location (concat org-roam-directory "/org-roam.db"))
+  (setq org-roam-dailies-directory "journal")
+  :config
   (org-roam-db-autosync-mode)
   (setq org-roam-node-display-template "${gn-node-display}")
 
@@ -440,11 +449,19 @@ This functions should be added to the 'org-mode-hook'."
 
   (setq org-roam-dailies-capture-templates
         '(("d" "default"
-           entry "* %?"
+           plain "*?"
            :target (file+head "%<%Y-%m-%d>.org"
                               "
 #+language: en
 #+title: %<%Y-%m-%d>
+
+* Daily routine
+
+** Morning meditation
+
+** Evening meditation
+
+* Self monitoring record
 ")
            :immediate-finish
            :jump-to-captured))))
