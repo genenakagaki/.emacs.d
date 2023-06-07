@@ -443,9 +443,7 @@ Add company autocompletion for yasnippet
 
 ** Git client (Magit)
 #+begin_src emacs-lisp :tangle yes
-  (use-package magit
-    :config
-    (setq magit-refresh-status-buffer nil))
+  (use-package magit)
 
   (general-def 'n magit-status-mode-map
     ;; Magit binds the M-w to another command, so change it back to my keybinding
@@ -734,6 +732,10 @@ Org-roam
   (use-package docker)
 #+end_src
 
+** Dired
+#+begin_src emacs-lisp :tangle yes
+  (setq dired-dwim-target t)
+#+end_src
 
 * Leader Keybindings
 #+begin_src emacs-lisp :tangle yes

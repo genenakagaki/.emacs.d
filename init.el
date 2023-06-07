@@ -331,9 +331,7 @@
 (general-def '(n i) clojure-mode-map
   "M-RET" 'cider-eval-defun-at-point)
 
-(use-package magit
-  :config
-  (setq magit-refresh-status-buffer nil))
+(use-package magit)
 
 (general-def 'n magit-status-mode-map
   ;; Magit binds the M-w to another command, so change it back to my keybinding
@@ -589,6 +587,8 @@ This functions should be added to the 'org-mode-hook'."
                '("\\.yml\\'" . yaml-mode)))
 
 (use-package docker)
+
+(setq dired-dwim-target t)
 
 (general-def 'n 'override
   :prefix gn/leader-key
