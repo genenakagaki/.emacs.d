@@ -267,12 +267,14 @@ Keybindings
 
 ** File manipulation
 #+begin_src emacs-lisp :tangle yes
-  (general-def 'n 
-    "M-o" 'find-file
-    "M-e" 'switch-to-buffer
-    "M-s" 'save-buffer
+  (general-def '(n i)
     "M-w" 'kill-current-buffer
     "M-q" 'save-buffers-kill-terminal)
+
+  (general-def '(n i) 'override
+    "M-o" 'find-file
+    "M-e" 'switch-to-buffer
+    "M-s" 'save-buffer)
 #+end_src
 
 ** Editing
@@ -379,6 +381,16 @@ Add company autocompletion for yasnippet
 #+end_src
 
 * Modes
+** Emacs preview
+#+begin_src emacs-lisp :tangle yes
+  (defvar gn/preview-file (expand-file-name "emacs-preview/src/preview-content.html"
+                                            user-emacs-directory))
+
+  (defun gn/preview-image (image-url)
+    "Preview IMAGE-URL image."
+    (with-temp-file gn/preview-file
+      (progn (insert "<img src=\"" image-url "\"/>"))))
+#+end_src
 ** Programming Language
 
 #+begin_src emacs-lisp :tangle yes
@@ -398,7 +410,7 @@ Add company autocompletion for yasnippet
       "(" 'paredit-open-round
       "[" 'paredit-open-square
       "{" 'paredit-open-curly
-      "<" 'paredit-open-angle)
+      "<" 'paredit-open-angled)
     (general-def 'n paredit-mode-map
       :prefix gn/leader-key
       "dw" #'paredit-splice-sexp
@@ -413,7 +425,6 @@ Add company autocompletion for yasnippet
     :config 
     :diminish nil)
 #+end_src
-
 
 *** Emacs Lisp 
 #+begin_src emacs-lisp :tangle yes
@@ -439,6 +450,11 @@ Add company autocompletion for yasnippet
 
   (general-def '(n i) clojure-mode-map
     "M-RET" 'cider-eval-defun-at-point)
+#+end_src
+
+*** JavaScript
+#+begin_src emacs-lisp :tangle yes
+  (setq js-indent-level 2)
 #+end_src
 
 ** Git client (Magit)
@@ -682,39 +698,31 @@ Org-roam
       (message (request-response-data response))
       (request-response-data response)))
 
-  (defun gn/plantuml-generate-diagram (encoded-plantuml-code)
-    "Generates PlanUML diagram from ENCODED-PLANUML-CODE."
-    (let* ((request-url (concat plantuml-server-url "/" plantuml-output-type "/" encoded-plantuml-code))
-           (response (request request-url
-                       :sync t
-                       :type "GET")))
-      (request-response-data response)))
+  (defun gn/plantuml-preview ()
+    (interactive)
+    (let* ((encoded-plantuml-code (gn/plantuml-encode (buffer-string)))
+           (image-url (concat plantuml-server-url "/png/" encoded-plantuml-code)))
+      (gn/preview-image image-url)))
+
+  (defun gn/plantuml-preview-on-save ()
+    (general-add-hook 'after-save-hook #'gn/plantuml-preview))
 
   (use-package plantuml-mode
+    :gfhook
+    #'gn/plantuml-preview-on-save
     :config
-    (setq plantuml-server-url "http://localhost:8080")
+    (setq plantuml-server-url "http://localhost:4700")
     (setq plantuml-exec-mode 'server)
-    (setq plantuml-output-type "png")
+    (setq plantuml-indent-level 4)
 
     (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+    (general-add-hook 'after-save-hook
+                      (lambda ()
+                        (when (= major-mode #'plantuml-mode)
+                          (gn/plantuml-preview)))))
 
-    ;; (url-retrieve url-request-location
-    ;;               (lambda (status)
-    ;;                 ;; TODO: error check
-    ;;                 (goto-char (point-min))
-    ;;                 ;; skip the HTTP headers
-    ;;                 (while (not (looking-at "\n"))
-    ;;                   (forward-line))
-    ;;                 (kill-region (point-min) (+ 1 (point)))
-    ;;                 (copy-to-buffer buf (point-min) (point-max))
-    ;;                 (plantuml-update-preview-buffer prefix buf)))
-
-    ;; Fix broken preview using server mode
-    (advice-add
-     'plantuml-server-encode-url :override
-     (lambda (string)
-       (let* ((encoded-string (gn/plantuml-encode string)))
-         (concat plantuml-server-url "/" plantuml-output-type "/" encoded-string)))))
+  (general-def '(n i) plantuml-mode-map
+    "M-RET" 'gn/plantuml-preview)
 
 
 #+end_src
@@ -779,6 +787,7 @@ Org-roam
 #+end_src
 
 * Configuration for Literate Emacs Config
+
 
 # Local Variables:
 # eval: (general-add-hook 'after-save-hook #'org-babel-tangle)

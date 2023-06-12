@@ -196,12 +196,14 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(general-def 'n 
-  "M-o" 'find-file
-  "M-e" 'switch-to-buffer
-  "M-s" 'save-buffer
+(general-def '(n i)
   "M-w" 'kill-current-buffer
   "M-q" 'save-buffers-kill-terminal)
+
+(general-def '(n i) 'override
+  "M-o" 'find-file
+  "M-e" 'switch-to-buffer
+  "M-s" 'save-buffer)
 
 ;; use spaces instead of tabs
 (setq-default indent-tabs-mode nil)
@@ -280,6 +282,14 @@
 
 (setq company-backends (mapcar #'company-mode/backend-with-yas company-backends))
 
+(defvar gn/preview-file (expand-file-name "emacs-preview/src/preview-content.html"
+                                          user-emacs-directory))
+
+(defun gn/preview-image (image-url)
+  "Preview IMAGE-URL image."
+  (with-temp-file gn/preview-file
+    (progn (insert "<img src=\"" image-url "\"/>"))))
+
 ;; Highlight the matching parenthesis
 (show-paren-mode t)
 
@@ -296,7 +306,7 @@
     "(" 'paredit-open-round
     "[" 'paredit-open-square
     "{" 'paredit-open-curly
-    "<" 'paredit-open-angle)
+    "<" 'paredit-open-angled)
   (general-def 'n paredit-mode-map
     :prefix gn/leader-key
     "dw" #'paredit-splice-sexp
@@ -330,6 +340,8 @@
 
 (general-def '(n i) clojure-mode-map
   "M-RET" 'cider-eval-defun-at-point)
+
+(setq js-indent-level 2)
 
 (use-package magit)
 
@@ -547,39 +559,31 @@ This functions should be added to the 'org-mode-hook'."
     (message (request-response-data response))
     (request-response-data response)))
 
-(defun gn/plantuml-generate-diagram (encoded-plantuml-code)
-  "Generates PlanUML diagram from ENCODED-PLANUML-CODE."
-  (let* ((request-url (concat plantuml-server-url "/" plantuml-output-type "/" encoded-plantuml-code))
-         (response (request request-url
-                     :sync t
-                     :type "GET")))
-    (request-response-data response)))
+(defun gn/plantuml-preview ()
+  (interactive)
+  (let* ((encoded-plantuml-code (gn/plantuml-encode (buffer-string)))
+         (image-url (concat plantuml-server-url "/png/" encoded-plantuml-code)))
+    (gn/preview-image image-url)))
+
+(defun gn/plantuml-preview-on-save ()
+  (general-add-hook 'after-save-hook #'gn/plantuml-preview))
 
 (use-package plantuml-mode
+  :gfhook
+  #'gn/plantuml-preview-on-save
   :config
-  (setq plantuml-server-url "http://localhost:8080")
+  (setq plantuml-server-url "http://localhost:4700")
   (setq plantuml-exec-mode 'server)
-  (setq plantuml-output-type "png")
+  (setq plantuml-indent-level 4)
 
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
+  (general-add-hook 'after-save-hook
+                    (lambda ()
+                      (when (= major-mode #'plantuml-mode)
+                        (gn/plantuml-preview)))))
 
-  ;; (url-retrieve url-request-location
-  ;;               (lambda (status)
-  ;;                 ;; TODO: error check
-  ;;                 (goto-char (point-min))
-  ;;                 ;; skip the HTTP headers
-  ;;                 (while (not (looking-at "\n"))
-  ;;                   (forward-line))
-  ;;                 (kill-region (point-min) (+ 1 (point)))
-  ;;                 (copy-to-buffer buf (point-min) (point-max))
-  ;;                 (plantuml-update-preview-buffer prefix buf)))
-
-  ;; Fix broken preview using server mode
-  (advice-add
-   'plantuml-server-encode-url :override
-   (lambda (string)
-     (let* ((encoded-string (gn/plantuml-encode string)))
-       (concat plantuml-server-url "/" plantuml-output-type "/" encoded-string)))))
+(general-def '(n i) plantuml-mode-map
+  "M-RET" 'gn/plantuml-preview)
 
 (use-package yaml-mode
   :config

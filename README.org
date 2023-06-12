@@ -36,9 +36,8 @@ https://github.com/bbatsov/emacs-lisp-style-guide
    https://www.flycheck.org/en/latest/languages.html#syntax-checker-emacs-lisp
 
 * Usage
-** Useful commands
-- re-builder :: creates regex interactively
-- general-describe-keybindings :: show all keybindings mapped with general.el
+
+  
 * Emacs Concepts
 ** Variables
 *** Directory local variables
@@ -85,105 +84,3 @@ https://orgmode.org/worg/dev/org-element-api.html
 Since general.el uses the =kbd= function, you can check the docs for that functions.
 If you want to create a certain mapping for a particular key, you can use the =describe-key= function, which is usually mapped to =C-h k=.
 
-* use-package
-Full example of package installation using use-package
-#+begin_example emacs-lisp
-(use-package sample ; package to install
-
-  ;; turn off a module
-  :disabled
-
-  ;; predicate the loading and initialization of modules
-  :if window-system
-  :when ; alias for `:if'
-  :unless ; true if condition is false
-
-  ;; conditions when loading should occur
-  ;; `:all' and `:any' keywords are supported
-  :after (:any some-package another-package)
-
-  ;; load the load-path before the package is loaded
-  :load-path "site-lisp/ess/lisp"
-
-  ;; never load the package if the dependencies are not available at the time the use-package is evaluated
-  :require some-package
-
-  ;; prevent loading package at compile time
-  ;; This can be useful when you have problems loading the package at compile time.
-  ;; This problem can occur when packages may have special loading requirements.
-  :no-require t
-
-  ;; override error handling
-  :catch (lambda (keyword err)
-           (message (error-message-string err)))
-
-  ;; introduce dummy variable and function declarations solely for the sake of the byte-compiler
-  ;; This helps to silence spurious warnings about unknown variables or functions
-  :defines sample-var
-  :functions sample-function
-
-  ;; defer loading of the package until you use it
-  ;; You don't need this if you have one of the following keywords
-  ;; `:commands', `:bind', `:bind-keymap', `:general', `:mode', `:interpreter', `:hook'
-  :defer t
-
-  ;; install automatically if not already present on the system
-  ;; You can also install different package from the one named by `use-package'
-  :ensure another-package
-
-  ;; ensure that system binaries exist alongside the package declaration
-  ;; requires 'exec-path-from-shell'
-  :ensure-system-package (sample . "npm i -g some-module")
-
-  ;; establish a deferred binding within the `auto-mode-alist' variable
-  :mode "\\.smpl\\'"
-
-  ;; establish a deferred binding within the `interpreter-mode-alist' variable
-  :interpreter "sample"
-
-  ;; trigger certain function to be run if the beginning of a file matches a given regular expression
-  :magic ("sample" . sample-mode)
-
-  ;; same as `:magic' but has lower priority
-  :magic-fallback ("sample" . sample-mode)
-
-  ;; allows adding functions onto package hooks
-  :hook ((some-hook another-hook) . sample-mode)
-
-  ;; creates autoloads for those commands and defers loading of the module until they are used
-  :commands sample-mode
-
-  ;; Does the following 2 things:
-  ;; 1. defers loading of the package until you use it
-  ;; 2. binds keys to commands
-  :bind
-  ;; I use `general.el' so I won't be using this keyword
-
-  ;; Same as `:bind', but to use when the command itself is a keymap
-  :bind-keymap
-
-  ;; Same as `:bind', but can use general keybindings
-  ;; requires `general.el'
-  :general
-
-  ;; execute code before a package is loaded
-  :init
-  ;; Some variables cause side effects when the package loads
-  ;; e.g. directory path variables may create directories when the package loads
-  (setq sample-path "/my/path")
-
-  ;; execute code after a package is loaded (lazy by default)
-  :config
-  (sample-mode t)
-
-  ;; allows customization of package custom variables
-  :custom
-
-  ;; allows customization of package custom faces
-  :custom-face
-
-  ;; built-in support for the `diminish' and `delight' utilities
-  :diminish
-  :delight
-  )
-#+end_example
