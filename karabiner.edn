@@ -1,0 +1,34 @@
+;; edn spec https://github.com/edn-format/edn
+{
+ ;; main list
+ :main
+ ;; [<from> <to>] or
+ ;; [<from> <to> <conditions>] or
+ ;; [<from> <to> <conditions> <other options>]
+ ;; <from> can be keywords defined in froms or keycodes without `{:not-from true}`
+ ;; <to> can be keywords defined in tos, keycodes without `{:not-to true}`, string (shell script)
+ ;; <conditions> can be keywords defined in layers, devices, applications
+ ;; <other options> {:other {:parameters {:to_delayed_action_delay_milliseconds 100 :basic.to_if_alone_timeout_milliseconds 500 :basic.to_if_held_down_threshold_milliseconds 250}} }
+ [{:des "Ctrl p/n to up/down arrow"
+   :rules [[:!Tr :up_arrow]
+           [:!Tl :down_arrow]]}
+  {:des "caps_lock to esc when pressed alone, to ctrl as modifier"
+   :rules [[:##caps_lock :left_control nil {:alone :escape}]]}
+  ] ;; h to 8 and set_variable
+
+ ;; code won't read cheatsheet section
+ ;; ! stand for mandatory
+ ;; # stand for optional
+ ;; C T O S for left command control optional shift
+ ;; F for fn
+ ;; need to prefix C T O S F with ! or #
+ :cheatsheet {:!Ca "command a" ;; mandatory left_command
+              :!Ta "control a" ;; mandatory left_control
+              :!Oa "option a"
+              :!Sa "shift a"
+              :#Sa "shift a" ;; keycode a, optional left_shift
+              :!CTOa "command control option a"
+              :!Cspacebar "command space"
+              :!Fa "fn a"
+              :##a "keycode a optional any"
+              :!!a "mandatory hyper(control command option shift) a "}}
