@@ -410,14 +410,24 @@ This functions should be added to the 'org-mode-hook'."
    org-directory "~/org-roam/"
 
    ;; Open src window in current window
-   org-src-window-setup "current-window")
+   org-src-window-setup "current-window"
+
+   ;; Add the org todo state changes and timestamps into the property
+   org-log-into-drawer "LOGBOOK"
+
+   ;; Add information to property when todo state changed to DONE
+   org-log-done 'time
+
+   ;; Remove clock times that are less than a minute
+   org-clock-out-remove-zero-time-clocks t
+   )
 
   ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook
                     '(gn/disable-emacs-lisp-flycheck))
 
   (setq org-todo-keywords
-        '((sequence "TODO(t)" "DOING" "|" "DONE" "CANCELLED(c)")
+        '((sequence "TODO(t)" "DOING" "IN-REVIEW" "|" "DONE" "CANCELLED(c)")
           (sequence "WAITING(w!)" "|" "DONE")
           (sequence "DELEGATED(d)" "|" "DONE")
           ))
@@ -425,7 +435,23 @@ This functions should be added to the 'org-mode-hook'."
         '(("TODO" . "#f1d1a2")
           ("WAITING" . "#da8548")
           ("DELEGATED" . "#da8548")
-          )))
+          ("IN-REVIEW" . "#da8548")
+          ))
+
+  (require 'org-clock)
+
+  (general-add-hook 'org-after-todo-state-change-hook
+                    (lambda ()
+                      (let* ((todo-clocking? (and (org-clocking-p)
+                                                  (< (point) org-clock-marker)
+                                                  (> (org-with-wide-buffer (org-entry-end-position))
+                                                     org-clock-marker))))
+                        (if (s-equals? org-state "DOING")
+                            (org-clock-in)
+                          (when todo-clocking?
+                            (org-clock-out))))))
+
+  )
 
 (use-package evil-org
   :after evil org
@@ -578,9 +604,10 @@ This functions should be added to the 'org-mode-hook'."
 
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
   (general-add-hook 'after-save-hook
-                    (lambda ()
-                      (when (= major-mode #'plantuml-mode)
+                    (lambda () 
+                      (when (eq major-mode #'plantuml-mode)
                         (gn/plantuml-preview)))))
+
 
 (general-def '(n i) plantuml-mode-map
   "M-RET" 'gn/plantuml-preview)
