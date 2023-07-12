@@ -1,39 +1,49 @@
 {:tasks
  {:requires ([babashka.fs :as fs]
              [clojure.string :as str])
-  :init (do (defn config-files []
+  :init (do (defn exit-with-error [error]
+              (println "Exited due to error")
+              (println error)
+              (System/exit 1))
+
+            (defn config-files []
               (->> (fs/glob "./config" "**.**" {:hidden true
                                                 :recursive true})
                    (map str)))
 
             (defn config-symlink-path [config-file]
-              (if (str/includes? config-file "homedir")
-                (str "~/" (fs/file-name config-file))
-                (str "~/" config-file)))
+              (-> (if (str/includes? config-file "homedir")
+                    (str "~/" (fs/file-name config-file))
+                    (str "~/." config-file))
+                  (fs/expand-home)))
+
+            (defn create-config-symlink [config-file]
+              (println "Creating symlink: ")
+              (let [source-path (str (fs/cwd) "/" config-file)
+                    target-path (config-symlink-path config-file)]
+                (println (str "   Source path: " source-path))
+                (println (str "   Target path: " target-path))
+                (fs/create-sym-link target-path source-path))
+              (println))
 
             (defn delete-symlink [symlink]
-              (if (fs/sym-link? symlink)
-                (fs/delete symlink)
-                (System/exit 1)))
-
-            
+              (println (str "Deleting symlink: " symlink))
+              (if (fs/exists? symlink)
+                (if (fs/sym-link? symlink)
+                  (do (fs/delete symlink)
+                      (println (str "   Deleted " symlink)))
+                  (exit-with-error (str symlink " is not a symlink")))
+                (println "   The file does not exist"))
+              (println))
             )
   clean-preview (shell "cd ./emacs-preview; rm -rf node_modules")
   install-preview (shell "cd ./emacs-preview; pnpm install")
   clean-config (->> (config-files)
                     (map config-symlink-path)
-                    (run! ))
-  setup-emacs (->> (fs/glob "./config" "**.**" {:hidden true
-                                                :recursive true})
-                   (map str)
-                   (map (fn [config]
-                          (let [target (if (str/includes? x "homedir")
-                                         (str "~/" (fs/file-name x))
-                                         (str "~/" x))]
-                            ())))
-                   (run! )
-                   prn
-                   )
+                    (run! delete-symlink))
+  setup-config (->> (config-files)
+                    (run! create-config-symlink)
+                    )
   
 
   }}
