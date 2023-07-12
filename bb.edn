@@ -1,0 +1,39 @@
+{:tasks
+ {:requires ([babashka.fs :as fs]
+             [clojure.string :as str])
+  :init (do (defn config-files []
+              (->> (fs/glob "./config" "**.**" {:hidden true
+                                                :recursive true})
+                   (map str)))
+
+            (defn config-symlink-path [config-file]
+              (if (str/includes? config-file "homedir")
+                (str "~/" (fs/file-name config-file))
+                (str "~/" config-file)))
+
+            (defn delete-symlink [symlink]
+              (if (fs/sym-link? symlink)
+                (fs/delete symlink)
+                (System/exit 1)))
+
+            
+            )
+  clean-preview (shell "cd ./emacs-preview; rm -rf node_modules")
+  install-preview (shell "cd ./emacs-preview; pnpm install")
+  clean-config (->> (config-files)
+                    (map config-symlink-path)
+                    (run! ))
+  setup-emacs (->> (fs/glob "./config" "**.**" {:hidden true
+                                                :recursive true})
+                   (map str)
+                   (map (fn [config]
+                          (let [target (if (str/includes? x "homedir")
+                                         (str "~/" (fs/file-name x))
+                                         (str "~/" x))]
+                            ())))
+                   (run! )
+                   prn
+                   )
+  
+
+  }}

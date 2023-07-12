@@ -1,7 +1,7 @@
 # /Users/genenakagaki/.config/tmuxinator/emacs.yml
 
 name: emacs
-root: ~/.emacs.test
+root: ~/.emacs.default
 
 # Optional tmux socket
 # socket_name: foo
@@ -51,6 +51,7 @@ windows:
       # 'before' represents legacy functionality and will be deprecated in a future release, in favour of 'after'
       # synchronize: after
       panes:
+        - emacs
         - gitwatch.sh -r origin ~/org-roam
         - docker compose up
         - cd ./emacs-preview; pnpm run dev; 
