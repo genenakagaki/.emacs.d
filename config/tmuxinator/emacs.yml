@@ -52,6 +52,6 @@ windows:
       # synchronize: after
       panes:
         - emacs
-        - gitwatch.sh -r origin ~/org-roam
+        - gitwatch -r origin ~/org-roam
         - docker compose up
-        - cd ./emacs-preview; pnpm run dev; 
+        - cd ./emacs-preview; pnpm run dev 

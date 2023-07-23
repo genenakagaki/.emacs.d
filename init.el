@@ -104,6 +104,8 @@
 ;;         (lambda ()
 ;;           (shell-command-to-string "pbpaste"))))
 
+(setq debug-on-error t)
+
 ;; vim emulation
 (use-package evil
   :after goto-chg
@@ -574,25 +576,25 @@ This functions should be added to the 'org-mode-hook'."
 
 (use-package request)
 
-(defun gn/plantuml-encode (plantuml-code)
-  "Encodes PLANTUML-CODE to a string that can be used to generate PlantUML diagrams."
-  (let* ((request-url (concat plantuml-server-url "/coder"))
-         (response (request request-url
-                     :sync t
-                     :type "POST"
-                     :data plantuml-code
-                     :headers '(("Content-Type" . "text/plain")))))
-    (message (request-response-data response))
-    (request-response-data response)))
-
-(defun gn/plantuml-preview ()
-  (interactive)
-  (let* ((encoded-plantuml-code (gn/plantuml-encode (buffer-string)))
-         (image-url (concat plantuml-server-url "/png/" encoded-plantuml-code)))
+(defun gn/preview-plantuml-image (encoded-plantuml-code)
+  (let* ((image-url (concat plantuml-server-url "/png/" encoded-plantuml-code)))
+    (message image-url)
     (gn/preview-image image-url)))
 
-(defun gn/plantuml-preview-on-save ()
-  (general-add-hook 'after-save-hook #'gn/plantuml-preview))
+(defun gn/plantuml-preview ()
+  "Encodes PLANTUML-CODE to a string that can be used to generate PlantUML diagrams."
+  (interactive)
+  (when (eq major-mode 'plantuml-mode)
+    (let* ((plantuml-code (buffer-string))
+           (request-url (concat plantuml-server-url "/coder")))
+      (request request-url
+        :type "POST"
+        :data plantuml-code
+        :headers '(("Content-Type" . "text/plain"))
+        :success (cl-function
+                  (lambda (&key data &allow-other-keys)
+                    (gn/preview-plantuml-image data))))
+      )))
 
 (use-package plantuml-mode
   :gfhook
@@ -604,10 +606,7 @@ This functions should be added to the 'org-mode-hook'."
 
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
   (general-add-hook 'after-save-hook
-                    (lambda () 
-                      (when (eq major-mode #'plantuml-mode)
-                        (gn/plantuml-preview)))))
-
+                    'gn/plantuml-preview))
 
 (general-def '(n i) plantuml-mode-map
   "M-RET" 'gn/plantuml-preview)
