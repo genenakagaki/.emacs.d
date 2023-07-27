@@ -432,6 +432,7 @@ This functions should be added to the 'org-mode-hook'."
         '((sequence "TODO(t)" "DOING" "IN-REVIEW" "|" "DONE" "CANCELLED(c)")
           (sequence "WAITING(w!)" "|" "DONE")
           (sequence "DELEGATED(d)" "|" "DONE")
+          (sequence "|" "CANCELLED")
           ))
   (setq org-todo-keyword-faces
         '(("TODO" . "#f1d1a2")
@@ -624,7 +625,7 @@ This functions should be added to the 'org-mode-hook'."
   :prefix gn/leader-key
 
   "o" '(:ignore t :wk "Open")
-  "og" 'magit-status
+  "og" 'magit-list-repositories
   "on" '(org-roam-node-find :wk "Org roam node")
   "or" '(org-roam-graph :wk "Org roam graph")
   "ot" '(gn/open-task-inbox :wk "Task inbox")
