@@ -598,8 +598,6 @@ This functions should be added to the 'org-mode-hook'."
       )))
 
 (use-package plantuml-mode
-  :gfhook
-  #'gn/plantuml-preview-on-save
   :config
   (setq plantuml-server-url "http://localhost:4700")
   (setq plantuml-exec-mode 'server)
