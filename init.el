@@ -12,7 +12,10 @@
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 
+;; Confirm before exiting emacs
 (setq confirm-kill-emacs 'yes-or-no-p)
+
+(setq display-line-numbers t)
 
 ;;; Setup how backup behaves.
 
@@ -104,7 +107,7 @@
 ;;         (lambda ()
 ;;           (shell-command-to-string "pbpaste"))))
 
-(setq debug-on-error t)
+(setq debug-on-error nil)
 
 ;; vim emulation
 (use-package evil
@@ -198,14 +201,9 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-(general-def '(n i)
-  "M-w" 'kill-current-buffer
-  "M-q" 'save-buffers-kill-terminal)
-
-(general-def '(n i) 'override
-  "M-o" 'find-file
-  "M-e" 'switch-to-buffer
-  "M-s" 'save-buffer)
+(defun gn/open-config-file ()
+  (interactive)
+  (find-file (expand-file-name "init.org" user-emacs-directory)))
 
 ;; use spaces instead of tabs
 (setq-default indent-tabs-mode nil)
@@ -619,6 +617,15 @@ This functions should be added to the 'org-mode-hook'."
 
 (setq dired-dwim-target t)
 
+(general-def '(n i)
+  "M-w" 'kill-current-buffer
+  "M-q" 'save-buffers-kill-terminal)
+
+(general-def '(n i) 'override
+  "M-o" 'find-file
+  "M-e" 'switch-to-buffer
+  "M-s" 'save-buffer)
+
 (general-def 'n 'override
   :prefix gn/leader-key
 
@@ -627,6 +634,7 @@ This functions should be added to the 'org-mode-hook'."
   "on" '(org-roam-node-find :wk "Org roam node")
   "or" '(org-roam-graph :wk "Org roam graph")
   "ot" '(gn/open-task-inbox :wk "Task inbox")
+  "oc" '(gn/open-config-file :wk "Config file")
 
   "i" '(:ignore t :wk "Insert")
   "is" '(yas-insert-snippet :wk "Insert snippet")

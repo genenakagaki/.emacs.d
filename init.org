@@ -28,7 +28,10 @@ Change working directory to the emacs config directory
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
 
+  ;; Confirm before exiting emacs
   (setq confirm-kill-emacs 'yes-or-no-p)
+
+  (setq display-line-numbers t)
 #+end_src
 
 ** Backups
@@ -151,11 +154,9 @@ Clipboard (copy and paste) configuration
 
 ** Debugger
 #+begin_src emacs-lisp :tangle yes
-  (setq debug-on-error t)
+    (setq debug-on-error nil)
 #+end_src
 
-#+RESULTS:
-: t
 
 * Editor
   
@@ -272,17 +273,11 @@ Keybindings
     (doom-themes-org-config))
 #+end_src
 
-
-** File manipulation
+** File
 #+begin_src emacs-lisp :tangle yes
-  (general-def '(n i)
-    "M-w" 'kill-current-buffer
-    "M-q" 'save-buffers-kill-terminal)
-
-  (general-def '(n i) 'override
-    "M-o" 'find-file
-    "M-e" 'switch-to-buffer
-    "M-s" 'save-buffer)
+  (defun gn/open-config-file ()
+    (interactive)
+    (find-file (expand-file-name "init.org" user-emacs-directory)))
 #+end_src
 
 ** Editing
@@ -757,8 +752,6 @@ Org-roam
     "M-RET" 'gn/plantuml-preview)
 #+end_src
 
-#+RESULTS:
-
 
 ** YAML
 #+begin_src emacs-lisp :tangle yes
@@ -778,8 +771,17 @@ Org-roam
   (setq dired-dwim-target t)
 #+end_src
 
-* Leader Keybindings
+* Keybindings
 #+begin_src emacs-lisp :tangle yes
+  (general-def '(n i)
+    "M-w" 'kill-current-buffer
+    "M-q" 'save-buffers-kill-terminal)
+
+  (general-def '(n i) 'override
+    "M-o" 'find-file
+    "M-e" 'switch-to-buffer
+    "M-s" 'save-buffer)
+
   (general-def 'n 'override
     :prefix gn/leader-key
 
@@ -788,6 +790,7 @@ Org-roam
     "on" '(org-roam-node-find :wk "Org roam node")
     "or" '(org-roam-graph :wk "Org roam graph")
     "ot" '(gn/open-task-inbox :wk "Task inbox")
+    "oc" '(gn/open-config-file :wk "Config file")
 
     "i" '(:ignore t :wk "Insert")
     "is" '(yas-insert-snippet :wk "Insert snippet")
@@ -818,6 +821,8 @@ Org-roam
     "B" #'paredit-backward-barf-sexp)
 
 #+end_src
+
+#+RESULTS:
 
 * Configuration for Literate Emacs Config
 
