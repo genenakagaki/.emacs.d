@@ -15,7 +15,11 @@
 ;; Confirm before exiting emacs
 (setq confirm-kill-emacs 'yes-or-no-p)
 
-(setq display-line-numbers t)
+;; Show line numbers
+(global-display-line-numbers-mode t)
+
+;; Highlight current line
+(global-hl-line-mode t)
 
 ;;; Setup how backup behaves.
 
@@ -222,6 +226,9 @@
 (defun gn/disable-emacs-lisp-flycheck ()
   (setq flycheck-disabled-checkers '(emacs-lisp emacs-lisp-checkdoc)))
 
+(use-package symbol-overlay
+  :ghook 'prog-mode-hook)
+
 ;; Enable Vertico
 (use-package vertico
   :config
@@ -340,6 +347,9 @@
 
 (general-def '(n i) clojure-mode-map
   "M-RET" 'cider-eval-defun-at-point)
+
+(general-def 'v clojure-mode-map
+  "M-RET" 'cider-eval-region)
 
 (setq js-indent-level 2)
 
@@ -607,6 +617,15 @@ This functions should be added to the 'org-mode-hook'."
 
 (general-def '(n i) plantuml-mode-map
   "M-RET" 'gn/plantuml-preview)
+
+(use-package know-your-http-well)
+
+(use-package ob-http
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (http . t))))
 
 (use-package yaml-mode
   :config

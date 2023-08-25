@@ -31,7 +31,11 @@ Change working directory to the emacs config directory
   ;; Confirm before exiting emacs
   (setq confirm-kill-emacs 'yes-or-no-p)
 
-  (setq display-line-numbers t)
+  ;; Show line numbers
+  (global-display-line-numbers-mode t)
+
+  ;; Highlight current line
+  (global-hl-line-mode t)
 #+end_src
 
 ** Backups
@@ -310,6 +314,12 @@ Functions
     (setq flycheck-disabled-checkers '(emacs-lisp emacs-lisp-checkdoc)))
 #+end_src
 
+Highlight currently selected text
+#+begin_src emacs-lisp :tangle yes
+  (use-package symbol-overlay
+    :ghook 'prog-mode-hook)
+#+end_src
+
 ** Autocompletion
 #+begin_src emacs-lisp :tangle yes
   ;; Enable Vertico
@@ -453,6 +463,9 @@ Add company autocompletion for yasnippet
 
   (general-def '(n i) clojure-mode-map
     "M-RET" 'cider-eval-defun-at-point)
+
+  (general-def 'v clojure-mode-map
+    "M-RET" 'cider-eval-region)
 #+end_src
 
 *** JavaScript
@@ -751,6 +764,18 @@ Org-roam
   (general-def '(n i) plantuml-mode-map
     "M-RET" 'gn/plantuml-preview)
 #+end_src
+
+** HTTP Client
+#+begin_src emacs-lisp :tangle yes
+  (use-package know-your-http-well)
+
+  (use-package ob-http
+    :config
+    (org-babel-do-load-languages
+     'org-babel-load-languages
+     '((emacs-lisp . t)
+       (http . t))))
+#+END_src
 
 
 ** YAML
