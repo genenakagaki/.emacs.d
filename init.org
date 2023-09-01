@@ -161,6 +161,15 @@ Clipboard (copy and paste) configuration
     (setq debug-on-error nil)
 #+end_src
 
+* Window
+#+begin_src emacs-lisp :tangle yes
+  (defun gn/sticky-window/toggle ()
+    (interactive)
+    (set-window-dedicated-p (selected-window) (not (window-dedicated-p (selected-window)))))
+
+#+end_src
+
+
 
 * Editor
   
@@ -769,12 +778,10 @@ Org-roam
 #+begin_src emacs-lisp :tangle yes
   (use-package know-your-http-well)
 
-  (use-package ob-http
-    :config
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     '((emacs-lisp . t)
-       (http . t))))
+
+  (use-package verb
+    :mode ("\\.org\\'" . org-mode)
+    )
 #+END_src
 
 
@@ -820,7 +827,9 @@ Org-roam
     "i" '(:ignore t :wk "Insert")
     "is" '(yas-insert-snippet :wk "Insert snippet")
 
-    "TAB" '(:ignore t :wk "Toggle")
+    "r" '(:ignore t :wk "Run")
+
+    "t" '(:ignore t :wk "Toggle")
 
     ";" '(pp-eval-expression :wk "Eval expression")
     )
@@ -833,10 +842,17 @@ Org-roam
     "il" '(org-insert-link :wk "Insert link")
 
     ;; Toggle
-    "TAB TAB" 'gn/hydra-org-headline/body
-    "TAB l" 'org-toggle-link-display
-    "TAB n" #'org-narrow-to-subtree
-    "TAB w" #'widen)
+    "tt" 'gn/hydra-org-headline/body
+    "tl" 'org-toggle-link-display
+    "tn" #'org-narrow-to-subtree
+    "tw" #'widen
+
+    ;; Run
+    "rr" '(verb-send-request-on-point-other-window :wk "Send request")
+    )
+
+  (general-def 'n verb-response-body-mode-map
+    "oh" '(verb-toggle-show-headers :wk "HTTP headers"))
 
   (general-def 'n paredit-mode-map
     :prefix gn/leader-key

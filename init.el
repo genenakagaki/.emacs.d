@@ -113,6 +113,10 @@
 
 (setq debug-on-error nil)
 
+(defun gn/sticky-window/toggle ()
+  (interactive)
+  (set-window-dedicated-p (selected-window) (not (window-dedicated-p (selected-window)))))
+
 ;; vim emulation
 (use-package evil
   :after goto-chg
@@ -620,12 +624,10 @@ This functions should be added to the 'org-mode-hook'."
 
 (use-package know-your-http-well)
 
-(use-package ob-http
-  :config
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (http . t))))
+
+(use-package verb
+  :mode ("\\.org\\'" . org-mode)
+  )
 
 (use-package yaml-mode
   :config
@@ -658,7 +660,9 @@ This functions should be added to the 'org-mode-hook'."
   "i" '(:ignore t :wk "Insert")
   "is" '(yas-insert-snippet :wk "Insert snippet")
 
-  "TAB" '(:ignore t :wk "Toggle")
+  "r" '(:ignore t :wk "Run")
+
+  "t" '(:ignore t :wk "Toggle")
 
   ";" '(pp-eval-expression :wk "Eval expression")
   )
@@ -671,10 +675,17 @@ This functions should be added to the 'org-mode-hook'."
   "il" '(org-insert-link :wk "Insert link")
 
   ;; Toggle
-  "TAB TAB" 'gn/hydra-org-headline/body
-  "TAB l" 'org-toggle-link-display
-  "TAB n" #'org-narrow-to-subtree
-  "TAB w" #'widen)
+  "tt" 'gn/hydra-org-headline/body
+  "tl" 'org-toggle-link-display
+  "tn" #'org-narrow-to-subtree
+  "tw" #'widen
+
+  ;; Run
+  "rr" '(verb-send-request-on-point-other-window :wk "Send request")
+  )
+
+(general-def 'n verb-response-body-mode-map
+  "oh" '(verb-toggle-show-headers :wk "HTTP headers"))
 
 (general-def 'n paredit-mode-map
   :prefix gn/leader-key
