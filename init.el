@@ -346,6 +346,12 @@
   'clojure-mode-hook
   'clojurescript-mode-hook)
 
+(use-package clj-refactor)
+
+(use-package flycheck-clj-kondo
+  :config
+  (require 'flycheck-clj-kondo))
+
 (general-def 'n clojure-mode-map
   "M-RET" 'cider-eval-last-sexp)
 
