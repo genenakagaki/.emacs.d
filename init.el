@@ -165,29 +165,6 @@
 
 (use-package hydra)
 
-(defvar gn/leader-key "SPC")
-
-(general-def 'n 'override
-  "j" 'evil-next-visual-line
-  "k" 'evil-previous-visual-line)
-
-(general-def '(n i)
-  ;; Make similar experience with MacOS
-  "M-a" 'mark-whole-buffer)
-
-(general-def 'i 'override
-  ;; Copy
-  "M-c" 'evil-yank
-  ;; Paste 
-  "M-v" 'evil-paste-after)
-
-(general-def '(n v)
-  "C-a" 'evil-numbers/inc-at-pt
-  "C-x" 'evil-numbers/dec-at-pt)
-
-(general-def '(n m)
-  "s" 'avy-goto-char-2)
-
 ;;; Appearance
 (use-package doom-themes
   :config
@@ -262,10 +239,6 @@
         read-file-name-completion-ignore-case t
         read-buffer-completion-ignore-case t
         completion-ignore-case t)
-  (general-def 'n vertico-map
-    "?" #'minibuffer-completion-help
-    "M-RET" #'minibuffer-force-complete-and-exit
-    "M-TAB" #'minibuffer-complete)
   )
 
 ;; Provides helpful annotations for completion candidates in the minibuffer
@@ -279,9 +252,6 @@
 
 (use-package yasnippet
   :ensure yasnippet-snippets
-  :general
-  (general-def 'i 
-    "TAB" 'yas-insert-snippet)
   :config
   (yas-global-mode 1))
 
@@ -311,35 +281,8 @@
 ;; Adds easier shortcut for editing Lisp. 
 (use-package paredit
   :ghook ('(prog-mode-hook) #'enable-paredit-mode)
-  :general
-  (general-def 'i paredit-mode-map
-    ;; Add matching closing parenthesis.
-    "(" 'paredit-open-round
-    "[" 'paredit-open-square
-    "{" 'paredit-open-curly
-    "<" 'paredit-open-angled)
-  (general-def 'n paredit-mode-map
-    :prefix gn/leader-key
-    "dw" #'paredit-splice-sexp
-    "s" #'paredit-forward-slurp-sexp
-    "S" #'paredit-backward-slurp-sexp
-    "b" #'paredit-forward-barf-sexp
-    "B" #'paredit-backward-barf-sexp
-    "gl" #'paredit-forward
-    "gh" #'paredit-backward
-    "gj" #'paredit-forward-down
-    "gk" #'paredit-backward-up)
   :config 
   :diminish nil)
-
-(general-def '(n v) emacs-lisp-mode-map
-  "M-/" 'comment-dwim)
-
-(general-def 'n emacs-lisp-mode-map
-  "M-RET" 'eval-defun)
-
-(general-def 'v emacs-lisp-mode-map
-  "M-RET" 'eval-region)
 
 (use-package cider
   :ghook
@@ -352,27 +295,9 @@
   :config
   (require 'flycheck-clj-kondo))
 
-(general-def 'n clojure-mode-map
-  "M-RET" 'cider-eval-last-sexp)
-
-(general-def '(n i) clojure-mode-map
-  "M-RET" 'cider-eval-defun-at-point)
-
-(general-def 'v clojure-mode-map
-  "M-RET" 'cider-eval-region)
-
 (setq js-indent-level 2)
 
 (use-package magit)
-
-(general-def 'n magit-status-mode-map
-  ;; Magit binds the M-w to another command, so change it back to my keybinding
-  "M-w" 'kill-current-buffer)
-
-(general-def '(n i) with-editor-mode-map
-  ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
-  "M-w" 'with-editor-cancel
-  "M-RET" 'with-editor-finish)
 
 (defun yas/org-very-safe-expand ()
   (let ((yas/fallback-behavior 'return-nil)) (yas/expand)))
@@ -551,48 +476,6 @@ This functions should be added to the 'org-mode-hook'."
   (org-roam-db-sync)
   (org-roam-update-org-id-locations))
 
-(defhydra gn/hydra-org-headline (:color pink :hint nil)
-  "
-| Navigation^^           | TODO^^           |
-|------------------------+------------------|
-| _j_: next headline     |  |
-| _k_: previous headline | ^^               |
-| _h_: parent headline   | ^^               |
-| ^^                     | ^^               |
-| ^^                     | ^^               |
-| ^^                     | ^^               |
-"
-  ;; Navigation
-  ("j" org-next-visible-heading)
-  ("k" org-previous-visible-heading)
-  ("h" outline-up-heading)
-
-  ;; Todo stuff
-  ("J" org-shiftup)
-  ("K" org-shiftdown)
-  ("H" org-shiftleft)
-  ("L" org-shiftright)
-
-  ;; Quit
-  ("q" nil "quit")
-  ("<escape>" nil "quit"))
-
-(general-def 'n org-mode-map
-  ;; General org-mode usage
-  "RET" 'org-ctrl-c-ctrl-c
-  "M-h" 'org-metaleft
-  "M-H" 'org-shiftmetaleft
-  "M-l" 'org-metaright
-  "M-L" 'org-shiftmetaright)
-
-;; Source mode map
-(general-def 'n org-src-mode-map
-  "M-o" 'find-file
-  "M-e" 'switch-to-buffer
-  "M-s" 'save-buffer
-  "M-w" 'org-edit-src-abort
-  "M-q" 'save-buffers-kill-terminal)
-
 (use-package request)
 
 (defun gn/preview-plantuml-image (encoded-plantuml-code)
@@ -625,9 +508,6 @@ This functions should be added to the 'org-mode-hook'."
   (general-add-hook 'after-save-hook
                     'gn/plantuml-preview))
 
-(general-def '(n i) plantuml-mode-map
-  "M-RET" 'gn/plantuml-preview)
-
 (use-package know-your-http-well)
 
 
@@ -643,6 +523,29 @@ This functions should be added to the 'org-mode-hook'."
 (use-package docker)
 
 (setq dired-dwim-target t)
+
+(defvar gn/leader-key "SPC")
+
+(general-def 'n 'override
+  "j" 'evil-next-visual-line
+  "k" 'evil-previous-visual-line)
+
+(general-def '(n i)
+  ;; Make similar experience with MacOS
+  "M-a" 'mark-whole-buffer)
+
+(general-def 'i 'override
+  ;; Copy
+  "M-c" 'evil-yank
+  ;; Paste 
+  "M-v" 'evil-paste-after)
+
+(general-def '(n v)
+  "C-a" 'evil-numbers/inc-at-pt
+  "C-x" 'evil-numbers/dec-at-pt)
+
+(general-def '(n m)
+  "s" 'avy-goto-char-2)
 
 (general-def '(n i)
   "M-w" 'kill-current-buffer
@@ -693,9 +596,100 @@ This functions should be added to the 'org-mode-hook'."
 (general-def 'n verb-response-body-mode-map
   "oh" '(verb-toggle-show-headers :wk "HTTP headers"))
 
+(general-def 'n vertico-map
+  "?" #'minibuffer-completion-help
+  "M-RET" #'minibuffer-force-complete-and-exit
+  "M-TAB" #'minibuffer-complete)
+
+(general-def 'i 
+  "TAB" 'yas-insert-snippet)
+
+(general-def 'i paredit-mode-map
+  ;; Add matching closing parenthesis.
+  "(" 'paredit-open-round
+  "[" 'paredit-open-square
+  "{" 'paredit-open-curly
+  "<" 'paredit-open-angled)
 (general-def 'n paredit-mode-map
   :prefix gn/leader-key
+  "dw" #'paredit-splice-sexp
   "s" #'paredit-forward-slurp-sexp
   "S" #'paredit-backward-slurp-sexp
   "b" #'paredit-forward-barf-sexp
-  "B" #'paredit-backward-barf-sexp)
+  "B" #'paredit-backward-barf-sexp
+  "gl" #'paredit-forward
+  "gh" #'paredit-backward
+  "gj" #'paredit-forward-down
+  "gk" #'paredit-backward-up)
+
+(general-def '(n v) emacs-lisp-mode-map
+  "M-/" 'comment-dwim)
+
+(general-def '(n i) emacs-lisp-mode-map
+  "M-RET" 'eval-defun)
+
+(general-def 'v emacs-lisp-mode-map
+  "M-RET" 'eval-region)
+
+(general-def 'n clojure-mode-map
+  "M-RET" 'cider-eval-last-sexp)
+
+(general-def '(n i) clojure-mode-map
+  "M-RET" 'cider-eval-defun-at-point)
+
+(general-def 'v clojure-mode-map
+  "M-RET" 'cider-eval-region)
+
+(general-def 'n magit-status-mode-map
+  ;; Magit binds the M-w to another command, so change it back to my keybinding
+  "M-w" 'kill-current-buffer)
+
+(general-def '(n i) with-editor-mode-map
+  ;; Make the M-w similar to the "close" behavior, but 'kill-current-buffer' breaks the magit process, so adjust for it 
+  "M-w" 'with-editor-cancel
+  "M-RET" 'with-editor-finish)
+
+(defhydra gn/hydra-org-headline (:color pink :hint nil)
+  "
+| Navigation^^           | TODO^^           |
+|------------------------+------------------|
+| _j_: next headline     |  |
+| _k_: previous headline | ^^               |
+| _h_: parent headline   | ^^               |
+| ^^                     | ^^               |
+| ^^                     | ^^               |
+| ^^                     | ^^               |
+"
+  ;; Navigation
+  ("j" org-next-visible-heading)
+  ("k" org-previous-visible-heading)
+  ("h" outline-up-heading)
+
+  ;; Todo stuff
+  ("J" org-shiftup)
+  ("K" org-shiftdown)
+  ("H" org-shiftleft)
+  ("L" org-shiftright)
+
+  ;; Quit
+  ("q" nil "quit")
+  ("<escape>" nil "quit"))
+
+(general-def 'n org-mode-map
+  ;; General org-mode usage
+  "RET" 'org-ctrl-c-ctrl-c
+  "M-h" 'org-metaleft
+  "M-H" 'org-shiftmetaleft
+  "M-l" 'org-metaright
+  "M-L" 'org-shiftmetaright)
+
+;; Source mode map
+(general-def 'n org-src-mode-map
+  "M-o" 'find-file
+  "M-e" 'switch-to-buffer
+  "M-s" 'save-buffer
+  "M-w" 'org-edit-src-abort
+  "M-q" 'save-buffers-kill-terminal)
+
+(general-def '(n i) plantuml-mode-map
+  "M-RET" 'gn/plantuml-preview)
