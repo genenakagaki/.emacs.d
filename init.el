@@ -190,6 +190,19 @@
   (interactive)
   (find-file (expand-file-name "init.org" user-emacs-directory)))
 
+;; based on http://emacsredux.com/blog/2013/04/03/delete-file-and-buffer/
+(defun gn/delete-current-file ()
+  "Kill the current buffer and deletes the file it is visiting."
+  (interactive)
+  (let ((filename (buffer-file-name)))
+    (if filename
+        (if (y-or-n-p (concat "Do you really want to delete file " filename " ?"))
+            (progn
+              (delete-file filename)
+              (message "Deleted file %s." filename)
+              (kill-buffer)))
+      (message "Not a file visiting buffer!"))))
+
 ;; use spaces instead of tabs
 (setq-default indent-tabs-mode nil)
 
@@ -301,10 +314,11 @@
 
 (use-package tempel
   ;; Require trigger prefix before template name when completing.
-  ;; :custom
-  ;; (tempel-trigger-prefix ".")
+  :custom
+  (tempel-trigger-prefix ".")
 
   :config
+  (setq tempel-path (expand-file-name "templates.eld" user-emacs-directory))
 
   ;; Setup completion at point
   (defun tempel-setup-capf ()
@@ -319,9 +333,8 @@
                 (cons #'tempel-complete
                       completion-at-point-functions)))
 
-  (add-hook 'conf-mode-hook 'tempel-setup-capf)
-  (add-hook 'prog-mode-hook 'tempel-setup-capf)
-  (add-hook 'text-mode-hook 'tempel-setup-capf)
+  (general-add-hook '(conf-mode-hook prog-mode-hook text-mode-hook org-mode-hook)
+                    'tempel-setup-capf)
 
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
@@ -432,6 +445,9 @@ This functions should be added to the 'org-mode-hook'."
    ;; Remove clock times that are less than a minute
    org-clock-out-remove-zero-time-clocks t
    )
+
+
+  (add-to-list 'org-babel-load-languages '(sh . t))
 
   ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook

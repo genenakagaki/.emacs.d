@@ -235,7 +235,6 @@ Hydra
   (use-package hydra)
 #+end_src
 
-
 ** UI Theme
 #+begin_src emacs-lisp :tangle yes
   ;;; Appearance
@@ -265,6 +264,19 @@ Hydra
   (defun gn/open-config-file ()
     (interactive)
     (find-file (expand-file-name "init.org" user-emacs-directory)))
+  
+  ;; based on http://emacsredux.com/blog/2013/04/03/delete-file-and-buffer/
+  (defun gn/delete-current-file ()
+    "Kill the current buffer and deletes the file it is visiting."
+    (interactive)
+    (let ((filename (buffer-file-name)))
+      (if filename
+          (if (y-or-n-p (concat "Do you really want to delete file " filename " ?"))
+              (progn
+                (delete-file filename)
+                (message "Deleted file %s." filename)
+                (kill-buffer)))
+        (message "Not a file visiting buffer!"))))
 #+end_src
 
 ** Editing
@@ -396,7 +408,6 @@ In-buffer completion
 
 #+end_src
 
-
 ** Template
 yasnippet
 #+begin_src emacs-lisp :tangle yes
@@ -410,10 +421,11 @@ Tempel
 #+begin_src emacs-lisp :tangle yes
   (use-package tempel
     ;; Require trigger prefix before template name when completing.
-    ;; :custom
-    ;; (tempel-trigger-prefix ".")
+    :custom
+    (tempel-trigger-prefix ".")
 
     :config
+    (setq tempel-path (expand-file-name "templates.eld" user-emacs-directory))
 
     ;; Setup completion at point
     (defun tempel-setup-capf ()
@@ -428,9 +440,8 @@ Tempel
                   (cons #'tempel-complete
                         completion-at-point-functions)))
 
-    (add-hook 'conf-mode-hook 'tempel-setup-capf)
-    (add-hook 'prog-mode-hook 'tempel-setup-capf)
-    (add-hook 'text-mode-hook 'tempel-setup-capf)
+    (general-add-hook '(conf-mode-hook prog-mode-hook text-mode-hook org-mode-hook)
+                      'tempel-setup-capf)
 
     ;; Optionally make the Tempel templates available to Abbrev,
     ;; either locally or globally. `expand-abbrev' is bound to C-x '.
@@ -439,6 +450,9 @@ Tempel
     )
 
 #+end_src
+
+#+RESULTS:
+: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (25875 59397 111236 0) :init (25875 59397 111230 0) :config (25875 59397 111070 0) :config-secs (0 0 341 0) :init-secs (0 0 701 0) :use-package-secs (0 0 790 0)))
 
 * Modes
 ** Emacs preview
@@ -574,6 +588,9 @@ My org-mode functions
      org-clock-out-remove-zero-time-clocks t
      )
 
+  
+    (add-to-list 'org-babel-load-languages '(sh . t))
+
     ;; Disable flycheck for emacs literate configuration
     (general-add-hook 'org-src-mode-hook
                       '(gn/disable-emacs-lisp-flycheck))
@@ -606,6 +623,9 @@ My org-mode functions
 
     )
 #+end_src
+
+#+RESULTS:
+: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (25877 21144 251215 0) :init (25877 21144 251204 0) :config (25877 21144 251054 0) :config-secs (0 0 266 0) :init-secs (0 0 584 0) :use-package-secs (0 0 662 0)))
 
 Vim keybinding
 #+begin_src emacs-lisp :tangle yes :results none
