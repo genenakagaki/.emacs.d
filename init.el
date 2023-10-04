@@ -587,8 +587,12 @@ This functions should be added to the 'org-mode-hook'."
   (setq plantuml-indent-level 4)
 
   (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-  (general-add-hook 'after-save-hook
-                    'gn/plantuml-preview))
+  (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
+  (general-add-hook (list 'after-save-hook 'plantuml-mode-hook) 
+                    'gn/plantuml-preview)
+
+
+  )
 
 (use-package know-your-http-well)
 

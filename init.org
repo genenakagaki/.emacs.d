@@ -624,9 +624,6 @@ My org-mode functions
     )
 #+end_src
 
-#+RESULTS:
-: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (25877 21144 251215 0) :init (25877 21144 251204 0) :config (25877 21144 251054 0) :config-secs (0 0 266 0) :init-secs (0 0 584 0) :use-package-secs (0 0 662 0)))
-
 Vim keybinding
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package evil-org
@@ -741,8 +738,12 @@ Org-roam
     (setq plantuml-indent-level 4)
 
     (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-    (general-add-hook 'after-save-hook
-                      'gn/plantuml-preview))
+    (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
+    (general-add-hook (list 'after-save-hook 'plantuml-mode-hook) 
+                      'gn/plantuml-preview)
+
+
+    )
 #+end_src
 
 ** HTTP Client
