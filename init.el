@@ -434,7 +434,7 @@ This functions should be added to the 'org-mode-hook'."
    org-directory "~/org-roam/"
 
    ;; Open src window in current window
-   org-src-window-setup "current-window"
+   org-src-window-setup 'current-window
 
    ;; Add the org todo state changes and timestamps into the property
    org-log-into-drawer "LOGBOOK"
@@ -478,7 +478,20 @@ This functions should be added to the 'org-mode-hook'."
                             (org-clock-in)
                           (when todo-clocking?
                             (org-clock-out))))))
+  )
 
+(use-package org-download
+  :config
+
+  ;; Download to a directory
+  (setq org-download-method 'directory)
+  ;; Don't include heading name in the download directory path
+  (setq org-download-heading-lvl nil)
+  ;; The directory to put downloaded images
+  (setq org-download-image-dir nil)
+
+  ;; Drag-and-drop to `dired`
+  (general-add-hook 'dired-mode-hook 'org-download-enable)
   )
 
 (use-package evil-org
