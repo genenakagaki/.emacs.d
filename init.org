@@ -161,6 +161,15 @@ Clipboard (copy and paste) configuration
     (setq debug-on-error nil)
 #+end_src
 
+* Util functions
+#+begin_src emacs-lisp :tangle yes :results none
+  (defun indent-buffer ()
+    (interactive)
+    (save-excursion
+      (indent-region (point-min) (point-max) nil))
+    (message "indent done"))
+#+end_src
+
 * Window
 #+begin_src emacs-lisp :tangle yes
   (defun gn/sticky-window/toggle ()
@@ -418,7 +427,7 @@ yasnippet
 #+end_src
 
 Tempel
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle yes :results none
   (use-package tempel
     ;; Require trigger prefix before template name when completing.
     :custom
@@ -450,9 +459,6 @@ Tempel
     )
 
 #+end_src
-
-#+RESULTS:
-: #s(hash-table size 65 test eql rehash-size 1.5 rehash-threshold 0.8125 data (:use-package (25875 59397 111236 0) :init (25875 59397 111230 0) :config (25875 59397 111070 0) :config-secs (0 0 341 0) :init-secs (0 0 701 0) :use-package-secs (0 0 790 0)))
 
 * Modes
 ** Emacs preview
@@ -884,6 +890,13 @@ In buffer completion
 #+begin_src emacs-lisp :tangle yes
   (general-def 'i 
     "C-n" #'completion-at-point)
+#+end_src
+
+TempEL 
+#+begin_src emacs-lisp :tangle yes :results none
+  ;; (general-def '(n i) tempel-map
+  ;;   "RET" #'tempel-next
+  ;;   "S-RET" #'tempel-previous)
 #+end_src
 
 *** Programming Language
