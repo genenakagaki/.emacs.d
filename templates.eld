@@ -156,17 +156,26 @@ org-mode
 
 plantuml-mode
 
-(uml "@startuml" n
-     "@enduml")
-(if "if (" (s condition) ") then (" (s left) ")" n
-    "else (" (s right) ")" n
+(uml "@startuml 
+<style>
+diamond {
+    BackgroundColor business
+}
+</style> 
+@enduml")
+(if "if (" (s condition) ") then (no" (s left) ")" n
+    "else (yes" (s right) ")" n
     "endif"
     :post (indent-buffer))
+(split "split
+split again
+end split"
+       :post (indent-buffer))
 (business "#business:" p ";")
 (green "#palegreen:TODO: " n p ";")
 (error "#pink:エラー;" n>
        "stop")
-(font "<color " p ">" q "</color>")
+(font "<color:" p ">" q "</color>")
 (note "note left" n
       > q n
       "end note"

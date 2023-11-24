@@ -729,6 +729,14 @@ Org-roam
     (org-roam-update-org-id-locations))
 #+end_src
 
+Align org mode table even when there are Japanese characters
+#+begin_src emacs-lisp
+  (use-package valign
+    :config
+    (general-add-hook 'org-mode-hook 'valign-mode))
+#+end_src
+
+
 ** PlantUML
 #+begin_src emacs-lisp :tangle yes
   (use-package request)
