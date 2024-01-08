@@ -483,6 +483,15 @@ Tempel
 #+end_src
 
 *** Emacs Lisp 
+#+begin_src emacs-lisp :tangle yes :results none
+  (defun gn/eval-region (start end)
+    (interactive "r")
+    (eval-region start end t))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package parseedn)
+#+end_src
 
 *** Clojure
 #+begin_src emacs-lisp :tangle yes
@@ -918,7 +927,7 @@ In buffer completion
     "M-RET" 'eval-defun)
 
   (general-def 'v emacs-lisp-mode-map
-    "M-RET" 'eval-region)
+    "M-RET" 'gn/eval-region)
 #+end_src
 
 **** Clojure

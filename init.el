@@ -363,6 +363,12 @@
   :config 
   :diminish nil)
 
+(defun gn/eval-region (start end)
+  (interactive "r")
+  (eval-region start end t))
+
+(use-package parseedn)
+
 (use-package cider
   :ghook
   'clojure-mode-hook
@@ -728,7 +734,7 @@ This functions should be added to the 'org-mode-hook'."
   "M-RET" 'eval-defun)
 
 (general-def 'v emacs-lisp-mode-map
-  "M-RET" 'eval-region)
+  "M-RET" 'gn/eval-region)
 
 (general-def 'n clojure-mode-map
   "M-RET" 'cider-eval-last-sexp)
