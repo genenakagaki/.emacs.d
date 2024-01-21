@@ -1,0 +1,37 @@
+@startuml
+title Org Mode Preview
+
+actor me
+
+node Emacs {
+    usecase "Modify org mode code" as modify
+    usecase "Convert org mode to hiccup" as hiccup
+    usecase "Set html to vue file" as vue
+}
+
+node Vite <<server>> {
+    usecase "Do HMR stuff" as hmr
+}
+
+node Clojure <<server>> {
+    usecase "Generate HTML from hiccup" as generate
+
+}
+
+node Browser {
+    usecase "Preview org mode" as preview
+    usecase "Display updated org mode" as display
+}
+
+me --> modify
+me --> preview
+modify --> hiccup
+hiccup --> generate
+generate -up-> vue
+vue --> hmr
+hmr -up-> display
+
+' Stuff for display
+preview -[hidden]-> display
+
+@enduml
