@@ -113,6 +113,12 @@
 
 (setq debug-on-error nil)
 
+(defun indent-buffer ()
+  (interactive)
+  (save-excursion
+    (indent-region (point-min) (point-max) nil))
+  (message "indent done"))
+
 (defun gn/sticky-window/toggle ()
   (interactive)
   (set-window-dedicated-p (selected-window) (not (window-dedicated-p (selected-window)))))
@@ -708,6 +714,10 @@ This functions should be added to the 'org-mode-hook'."
 
 (general-def 'i 
   "C-n" #'completion-at-point)
+
+;; (general-def '(n i) tempel-map
+;;   "RET" #'tempel-next
+;;   "S-RET" #'tempel-previous)
 
 (general-def 'i paredit-mode-map
   ;; Add matching closing parenthesis.

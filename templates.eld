@@ -93,6 +93,8 @@ emacs-lisp-mode
          ";;; " (file-name-nondirectory (or (buffer-file-name) (buffer-name)))
          " ends here" n)
 
+clojure-mode
+
 eshell-mode
 
 (for "for " (p "i") " in " p " { " q " }")
@@ -151,6 +153,53 @@ org-mode
 (elisp "#+begin_src emacs-lisp" n r n "#+end_src" :post (org-edit-src-code))
 (inlsrc "src_" p "{" q "}")
 (title "#+title: " p n "#+author: Daniel Mendler" n "#+language: en")
+
+plantuml-mode
+
+(uml "@startuml 
+<style>
+diamond {
+    BackgroundColor business
+}
+</style> 
+@enduml")
+(if "if (" (s condition) ") then (no" (s left) ")" n
+    "else (yes" (s right) ")" n
+    "endif"
+    :post (indent-buffer))
+(split "split
+split again
+end split"
+       :post (indent-buffer))
+(business "#business:" p ";")
+(green "#palegreen:TODO: " n p ";")
+(error "#pink:エラー;" n>
+       "stop")
+(font "<color:" p ">" q "</color>")
+(note "note left" n
+      > q n
+      "end note"
+      :post (indent-buffer))
+;; task-specific
+(reject "#business:与信を0にする;" n>
+        "#business:会員へのメッセージ選択" n>
+        "テンプレートID：" q ";" n>
+        "#pink:却下;" n>
+        "stop")
+(remand "#business:メモ欄に記載" n>
+        "「" q "」;" n>
+        "#pink:差し戻し;" n>
+        "stop")
+(continue "#business:審査続行;" n>
+          "stop")
+(message "#business:会員へのメッセージ選択" n>
+         "テンプレートID：" q ";")
+(manual "\\n<back:salmon>自動化：不可</back>\\n<back:salmon>" q "</back>")
+(auto-hard "\\n<back:orange>自動化：可能だけど難しい</back>\\n<back:orange>" q "</back>")
+(back-orange "\\n<back:orange>" q "</back>")
+
+
+
 
 ;; Local Variables:
 ;; mode: lisp-data
