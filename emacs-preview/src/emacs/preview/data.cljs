@@ -45,7 +45,8 @@
                                      
                            :parent nil},
                              
-                   :contents nil}]} {:type "keyword",
+                   :contents nil}]}
+      {:type "keyword",
                                                
        :props {:key "LANGUAGE",
                                                        
