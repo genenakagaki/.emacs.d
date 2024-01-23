@@ -42,7 +42,18 @@ module.exports = {
         'high': '.87',
         'med': '.60',
         'low': '.30',
-      }
+      },
+      typography: (theme) => ({
+        DEFAULT: {
+          css: {
+            a: {
+              color: 'var(--tw-prose-links)',
+              textDecoration: 'underline',
+              fontWeight: 'inherit',
+            },
+          }
+        }
+      })
     },
   },
   plugins: [
