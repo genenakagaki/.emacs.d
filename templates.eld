@@ -162,6 +162,12 @@ diamond {
     BackgroundColor business
 }
 </style> 
+
+legend top
+    <back:application>システムの処理</back> 
+    <back:business>会員アクション</back> 
+    <back:palegreen>まだ考慮する必要あり</back> 
+endlegend
 @enduml")
 (if "if (" (s condition) ") then (no" (s left) ")" n
     "else (yes" (s right) ")" n
@@ -172,6 +178,7 @@ split again
 end split"
        :post (indent-buffer))
 (business "#business:" p ";")
+(application "#application:" p ";")
 (green "#palegreen:TODO: " n p ";")
 (error "#pink:エラー;" n>
        "stop")

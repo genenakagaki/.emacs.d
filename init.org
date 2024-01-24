@@ -481,10 +481,14 @@ Tempel
   (use-package rainbow-delimiters
     :ghook 'prog-mode-hook)
 
+  (defun gn/paredit-add-space-for-delimiter-p (endp delimiter)
+    nil)
+
   ;; Adds easier shortcut for editing Lisp. 
   (use-package paredit
     :ghook ('(prog-mode-hook) #'enable-paredit-mode)
-    :config 
+    :config
+    (setq paredit-space-for-delimiter-predicates '(gn/paredit-add-space-for-delimiter-p))
     :diminish nil)
 #+end_src
 
@@ -594,8 +598,9 @@ My org-mode functions
      org-clock-out-remove-zero-time-clocks t
      )
 
-  
-    (add-to-list 'org-babel-load-languages '(sh . t))
+
+    (org-babel-do-load-languages
+     'org-babel-load-languages '((shell . t)))
 
     ;; Disable flycheck for emacs literate configuration
     (general-add-hook 'org-src-mode-hook
@@ -627,6 +632,13 @@ My org-mode functions
                             (when todo-clocking?
                               (org-clock-out))))))
     )
+#+end_src
+
+asynchronous execution of org-babel src blocks
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package ob-async
+    :config
+    (require 'ob-async))
 #+end_src
 
 Org image handling
@@ -735,7 +747,6 @@ Align org mode table even when there are Japanese characters
     :config
     (general-add-hook 'org-mode-hook 'valign-mode))
 #+end_src
-
 
 ** PlantUML
 #+begin_src emacs-lisp :tangle yes
