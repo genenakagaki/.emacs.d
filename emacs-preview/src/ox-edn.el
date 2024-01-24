@@ -72,6 +72,8 @@ Export from org to edn starting...")
     (with-temp-buffer
       (insert "(ns emacs.preview.data)
 
+(def image-data nil)
+
 (def org-data
 ")
       (parseedn-print edn)
