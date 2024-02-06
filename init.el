@@ -119,6 +119,9 @@
     (indent-region (point-min) (point-max) nil))
   (message "indent done"))
 
+(use-package tree-sitter)
+(use-package tree-sitter-langs)
+
 (defun gn/sticky-window/toggle ()
   (interactive)
   (set-window-dedicated-p (selected-window) (not (window-dedicated-p (selected-window)))))

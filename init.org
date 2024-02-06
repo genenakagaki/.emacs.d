@@ -162,12 +162,20 @@ Clipboard (copy and paste) configuration
 #+end_src
 
 * Util functions
+
+** Custom Functions
 #+begin_src emacs-lisp :tangle yes :results none
   (defun indent-buffer ()
     (interactive)
     (save-excursion
       (indent-region (point-min) (point-max) nil))
     (message "indent done"))
+#+end_src
+
+** Tree-sitter
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package tree-sitter)
+  (use-package tree-sitter-langs)
 #+end_src
 
 * Window
@@ -829,6 +837,12 @@ Align org mode table even when there are Japanese characters
 
 * Keybindings
 ** Global 
+Remove unwanted defaults
+#+begin_src emacs-lisp :eval never
+  (general-unbind '(n i v) global-map
+    "M-z")
+#+end_src
+
 #+begin_src emacs-lisp :tangle yes
   (defvar gn/leader-key "SPC")
 

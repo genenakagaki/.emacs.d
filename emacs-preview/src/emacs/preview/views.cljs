@@ -64,6 +64,7 @@
    org-data))
 
 (defn main-panel []
-  (if (nil? org-data)
-    [:img {:src image-data}]
-    (org->html org-data)))
+  (cond
+    (some? org-data) (org->html org-data)
+    (some? image-data) [:img {:src image-data}]
+    :else [:div "no data"]))
