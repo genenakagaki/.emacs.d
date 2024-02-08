@@ -565,10 +565,9 @@ This functions should be added to the 'org-mode-hook'."
 
   ;; emacs preview
   (load (expand-file-name "emacs-preview/src/ox-edn.el" user-emacs-directory))
-  (general-add-hook 'org-mode-hook 
-                    (lambda ()
-                      (general-add-hook 'after-save-hook 'gn/ox-export-as-edn)))
-
+  ;; (general-add-hook 'org-mode-hook 
+  ;;                   (lambda ()
+  ;;                     (general-add-hook 'after-save-hook 'gn/ox-export-as-edn)))
   )
 
 
