@@ -66,6 +66,6 @@
 (defn main-panel []
   (cond
     (some? org-data) (org->html org-data)
-    (some? image-data) [:div.absolute.h-full.w-full.flex
+    (some? image-data) [:div.absolute.h-full.w-full.flex.bg-gray-700
                         [:img.m-auto {:src image-data}]]
     :else [:div "no data"]))
