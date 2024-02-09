@@ -1,24 +1,24 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+/out/
+/resources/public/js/compiled/
+/target/
+/*-init.clj
+/*.log
 
-node_modules
-dist
-dist-ssr
-*.local
+# Leiningen
+/.lein-*
+/.nrepl-port
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+# Node.js dependencies
+/node_modules/
+
+# shadow-cljs cache, port files
+/.shadow-cljs/
+
+# clj-kondo cache and configs from libs
+/.clj-kondo/*
+
+# clj-kondo config
+!/.clj-kondo/config.edn
+
+# clojure-lsp cache
+/.lsp/.cache

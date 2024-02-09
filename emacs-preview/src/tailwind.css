@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    a {
+        @apply cursor-pointer;
+    }
+
+    button {
+        @apply cursor-pointer;
+    }
+}
+
+
+@layer component {
+}
+

@@ -119,6 +119,9 @@
     (indent-region (point-min) (point-max) nil))
   (message "indent done"))
 
+(use-package tree-sitter)
+(use-package tree-sitter-langs)
+
 (defun gn/sticky-window/toggle ()
   (interactive)
   (set-window-dedicated-p (selected-window) (not (window-dedicated-p (selected-window)))))
@@ -348,13 +351,18 @@
   ;; (global-tempel-abbrev-mode)
   )
 
-(defvar gn/preview-file (expand-file-name "emacs-preview/src/preview-content.html"
+(defvar gn/preview-file (expand-file-name "emacs-preview/src/emacs/preview/data.cljs"
                                           user-emacs-directory))
 
 (defun gn/preview-image (image-url)
   "Preview IMAGE-URL image."
   (with-temp-file gn/preview-file
-    (progn (insert "<img src=\"" image-url "\"/>"))))
+    (progn
+      (insert "(ns emacs.preview.data)
+
+(def image-data \"" image-url "\")
+
+(def org-data nil)"))))
 
 ;; Highlight the matching parenthesis
 (show-paren-mode t)
@@ -372,6 +380,12 @@
   :config
   (setq paredit-space-for-delimiter-predicates '(gn/paredit-add-space-for-delimiter-p))
   :diminish nil)
+
+(defun gn/eval-region (start end)
+  (interactive "r")
+  (eval-region start end t))
+
+(use-package parseedn)
 
 (use-package cider
   :ghook
@@ -529,15 +543,15 @@ This functions should be added to the 'org-mode-hook'."
 
   (setq org-roam-capture-templates
         '(("d" "default"
-            plain "%?"
-            :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
-                               "
+           plain "%?"
+           :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+                              "
 #+language: en
 #+title: ${title}
 
 * {{{title}}}")
-            :immediate-finish
-            :jump-to-captured)))
+           :immediate-finish
+           :jump-to-captured)))
 
   (setq org-roam-dailies-capture-templates
         '(("d" "default"
@@ -556,7 +570,14 @@ This functions should be added to the 'org-mode-hook'."
 * Self monitoring record
 ")
            :immediate-finish
-           :jump-to-captured))))
+           :jump-to-captured)))
+
+  ;; emacs preview
+  (load (expand-file-name "emacs-preview/src/ox-edn.el" user-emacs-directory))
+  ;; (general-add-hook 'org-mode-hook 
+  ;;                   (lambda ()
+  ;;                     (general-add-hook 'after-save-hook 'gn/ox-export-as-edn)))
+  )
 
 
 (cl-defmethod org-roam-node-gn-node-display ((node org-roam-node))
@@ -747,7 +768,7 @@ This functions should be added to the 'org-mode-hook'."
   "M-RET" 'eval-defun)
 
 (general-def 'v emacs-lisp-mode-map
-  "M-RET" 'eval-region)
+  "M-RET" 'gn/eval-region)
 
 (general-def 'n clojure-mode-map
   "M-RET" 'cider-eval-last-sexp)

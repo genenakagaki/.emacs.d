@@ -162,12 +162,20 @@ Clipboard (copy and paste) configuration
 #+end_src
 
 * Util functions
+
+** Custom Functions
 #+begin_src emacs-lisp :tangle yes :results none
   (defun indent-buffer ()
     (interactive)
     (save-excursion
       (indent-region (point-min) (point-max) nil))
     (message "indent done"))
+#+end_src
+
+** Tree-sitter
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package tree-sitter)
+  (use-package tree-sitter-langs)
 #+end_src
 
 * Window
@@ -463,13 +471,18 @@ Tempel
 * Modes
 ** Emacs preview
 #+begin_src emacs-lisp :tangle yes
-  (defvar gn/preview-file (expand-file-name "emacs-preview/src/preview-content.html"
+  (defvar gn/preview-file (expand-file-name "emacs-preview/src/emacs/preview/data.cljs"
                                             user-emacs-directory))
 
   (defun gn/preview-image (image-url)
     "Preview IMAGE-URL image."
     (with-temp-file gn/preview-file
-      (progn (insert "<img src=\"" image-url "\"/>"))))
+      (progn
+        (insert "(ns emacs.preview.data)
+
+  (def image-data \"" image-url "\")
+
+  (def org-data nil)"))))
 #+end_src
 ** Programming Language
 
@@ -493,6 +506,15 @@ Tempel
 #+end_src
 
 *** Emacs Lisp 
+#+begin_src emacs-lisp :tangle yes :results none
+  (defun gn/eval-region (start end)
+    (interactive "r")
+    (eval-region start end t))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package parseedn)
+#+end_src
 
 *** Clojure
 #+begin_src emacs-lisp :tangle yes
@@ -683,15 +705,15 @@ Org-roam
 
     (setq org-roam-capture-templates
           '(("d" "default"
-              plain "%?"
-              :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
-                                 "
+             plain "%?"
+             :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+                                "
   ,#+language: en
   ,#+title: ${title}
 
   ,* {{{title}}}")
-              :immediate-finish
-              :jump-to-captured)))
+             :immediate-finish
+             :jump-to-captured)))
 
     (setq org-roam-dailies-capture-templates
           '(("d" "default"
@@ -710,7 +732,14 @@ Org-roam
   ,* Self monitoring record
   ")
              :immediate-finish
-             :jump-to-captured))))
+             :jump-to-captured)))
+
+    ;; emacs preview
+    (load (expand-file-name "emacs-preview/src/ox-edn.el" user-emacs-directory))
+    ;; (general-add-hook 'org-mode-hook 
+    ;;                   (lambda ()
+    ;;                     (general-add-hook 'after-save-hook 'gn/ox-export-as-edn)))
+    )
 
 
   (cl-defmethod org-roam-node-gn-node-display ((node org-roam-node))
@@ -818,6 +847,12 @@ Align org mode table even when there are Japanese characters
 
 * Keybindings
 ** Global 
+Remove unwanted defaults
+#+begin_src emacs-lisp :eval never
+  (general-unbind '(n i v) global-map
+    "M-z")
+#+end_src
+
 #+begin_src emacs-lisp :tangle yes
   (defvar gn/leader-key "SPC")
 
@@ -950,7 +985,7 @@ TempEL
     "M-RET" 'eval-defun)
 
   (general-def 'v emacs-lisp-mode-map
-    "M-RET" 'eval-region)
+    "M-RET" 'gn/eval-region)
 #+end_src
 
 **** Clojure
@@ -1029,7 +1064,7 @@ TempEL
 #+end_src
 
 * Configuration for Literate Emacs Config
-
+        
 # Local Variables:
 # eval: (general-add-hook 'after-save-hook #'org-babel-tangle)
 # End:

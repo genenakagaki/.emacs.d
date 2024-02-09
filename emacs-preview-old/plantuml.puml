@@ -1,5 +1,5 @@
 @startuml
-title Emacs Preview
+title PlantUML Preview
 
 actor me
 
