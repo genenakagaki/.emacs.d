@@ -371,10 +371,14 @@
 (use-package rainbow-delimiters
   :ghook 'prog-mode-hook)
 
+(defun gn/paredit-add-space-for-delimiter-p (endp delimiter)
+  nil)
+
 ;; Adds easier shortcut for editing Lisp. 
 (use-package paredit
   :ghook ('(prog-mode-hook) #'enable-paredit-mode)
-  :config 
+  :config
+  (setq paredit-space-for-delimiter-predicates '(gn/paredit-add-space-for-delimiter-p))
   :diminish nil)
 
 (defun gn/eval-region (start end)
@@ -467,7 +471,8 @@ This functions should be added to the 'org-mode-hook'."
    )
 
 
-  (add-to-list 'org-babel-load-languages '(sh . t))
+  (org-babel-do-load-languages
+   'org-babel-load-languages '((shell . t)))
 
   ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook
@@ -499,6 +504,10 @@ This functions should be added to the 'org-mode-hook'."
                           (when todo-clocking?
                             (org-clock-out))))))
   )
+
+(use-package ob-async
+  :config
+  (require 'ob-async))
 
 (use-package org-download
   :config
