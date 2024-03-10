@@ -399,6 +399,7 @@
   (require 'flycheck-clj-kondo))
 
 (setq js-indent-level 2)
+(add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
 
 (use-package magit)
 
@@ -470,9 +471,9 @@ This functions should be added to the 'org-mode-hook'."
    org-clock-out-remove-zero-time-clocks t
    )
 
-
   (org-babel-do-load-languages
-   'org-babel-load-languages '((shell . t)))
+   'org-babel-load-languages
+   '((shell . t)))
 
   ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook

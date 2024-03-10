@@ -533,6 +533,7 @@ Tempel
 *** JavaScript
 #+begin_src emacs-lisp :tangle yes
   (setq js-indent-level 2)
+  (add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
 #+end_src
 
 ** Git client (Magit)
@@ -620,9 +621,9 @@ My org-mode functions
      org-clock-out-remove-zero-time-clocks t
      )
 
-
     (org-babel-do-load-languages
-     'org-babel-load-languages '((shell . t)))
+     'org-babel-load-languages
+     '((shell . t)))
 
     ;; Disable flycheck for emacs literate configuration
     (general-add-hook 'org-src-mode-hook
