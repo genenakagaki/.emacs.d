@@ -416,6 +416,11 @@ This functions should be added to the 'org-mode-hook'."
   (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
   (define-key yas/keymap [tab] 'yas/next-field))
 
+(defun gn/open-task-inbox ()
+  "Opens the task inbox file. This is where you put all the tasks."
+  (interactive)
+  (find-file (concat org-roam-directory "/todo.org")))
+
 (defun gn/org-dwim-at-point ()
   (interactive)
   (message "gn/org-dwim-at-point")
@@ -505,13 +510,6 @@ This functions should be added to the 'org-mode-hook'."
                           (when todo-clocking?
                             (org-clock-out))))))
   )
-
-(setq gn/task-inbox (concat org-directory "/todo.org"))
-
-(defun gn/open-task-inbox ()
-  "Opens the task inbox file. This is where you put all the tasks."
-  (interactive)
-  (find-file (-first-item org-agenda-files)))
 
 (use-package ob-async
   :config
@@ -614,10 +612,6 @@ This functions should be added to the 'org-mode-hook'."
   (org-roam-db-clear-all)
   (org-roam-db-sync)
   (org-roam-update-org-id-locations))
-
-(use-package valign
-  :config
-  (general-add-hook 'org-mode-hook 'valign-mode))
 
 (use-package request)
 
