@@ -36,6 +36,8 @@ Change working directory to the emacs config directory
 
   ;; Highlight current line
   (global-hl-line-mode t)
+
+  (server-start)
 #+end_src
 
 ** Backups
@@ -183,7 +185,6 @@ Clipboard (copy and paste) configuration
   (defun gn/sticky-window/toggle ()
     (interactive)
     (set-window-dedicated-p (selected-window) (not (window-dedicated-p (selected-window)))))
-
 #+end_src
 
 
@@ -562,7 +563,8 @@ Tempel
 #+end_src
 
 My functions
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle yes :results none
+
   (defun gn/org-dwim-at-point ()
     (interactive)
     (message "gn/org-dwim-at-point")
@@ -581,10 +583,7 @@ My functions
         ('paragraph (let* ((parent (org-element-property :parent paragraph)))
                       (message "at paragraph")
                       )))))
-#+end_src
 
-My org-mode functions
-#+begin_src emacs-lisp :tangle yes
   (defun gn/org-fold-lines ()
     ;; This needs to be nil on order for 'toggle-truncate-lines' to work.
     (setq truncate-partial-width-windows nil)
@@ -594,6 +593,7 @@ My org-mode functions
     (setq truncate-lines nil))
 
 #+end_src
+
 
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package org
@@ -607,6 +607,9 @@ My org-mode functions
 
      ;; Set org-roam directory
      org-directory "~/org-roam/"
+
+     ;; Set org agenda
+     org-agenda-files `(,(concat org-directory "/todo.org"))
 
      ;; Open src window in current window
      org-src-window-setup 'current-window
@@ -1057,6 +1060,7 @@ TempEL
     "M-w" 'org-edit-src-abort
     "M-q" 'save-buffers-kill-terminal)
 #+end_src
+
 
 *** PlantUML
 #+begin_src emacs-lisp :tangle yes
