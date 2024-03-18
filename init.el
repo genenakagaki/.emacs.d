@@ -414,11 +414,6 @@ This functions should be added to the 'org-mode-hook'."
   (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
   (define-key yas/keymap [tab] 'yas/next-field))
 
-(defun gn/open-task-inbox ()
-  "Opens the task inbox file. This is where you put all the tasks."
-  (interactive)
-  (find-file (concat org-roam-directory "/todo.org")))
-
 (defun gn/org-dwim-at-point ()
   (interactive)
   (message "gn/org-dwim-at-point")
@@ -469,6 +464,13 @@ This functions should be added to the 'org-mode-hook'."
 
    ;; Remove clock times that are less than a minute
    org-clock-out-remove-zero-time-clocks t
+
+
+   ;; https://github.com/abo-abo/swiper/issues/986
+   ;; Use the search interface instead of the default
+   org-goto-interface 'outline-path-completion
+   ;; This needs to be nil for incremental search
+   org-outline-path-complete-in-steps nil
    )
 
   (org-babel-do-load-languages
@@ -479,31 +481,9 @@ This functions should be added to the 'org-mode-hook'."
   (general-add-hook 'org-src-mode-hook
                     '(gn/disable-emacs-lisp-flycheck))
 
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "DOING" "IN-REVIEW" "|" "DONE" "CANCELLED(c)")
-          (sequence "WAITING(w!)" "|" "DONE")
-          (sequence "DELEGATED(d)" "|" "DONE")
-          (sequence "|" "CANCELLED")
-          ))
-  (setq org-todo-keyword-faces
-        '(("TODO" . "#f1d1a2")
-          ("WAITING" . "#da8548")
-          ("DELEGATED" . "#da8548")
-          ("IN-REVIEW" . "#da8548")
-          ))
 
   (require 'org-clock)
 
-  (general-add-hook 'org-after-todo-state-change-hook
-                    (lambda ()
-                      (let* ((todo-clocking? (and (org-clocking-p)
-                                                  (< (point) org-clock-marker)
-                                                  (> (org-with-wide-buffer (org-entry-end-position))
-                                                     org-clock-marker))))
-                        (if (s-equals? org-state "DOING")
-                            (org-clock-in)
-                          (when todo-clocking?
-                            (org-clock-out))))))
   )
 
 (use-package ob-async
@@ -608,6 +588,41 @@ This functions should be added to the 'org-mode-hook'."
   (org-roam-db-sync)
   (org-roam-update-org-id-locations))
 
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "DOING" "IN-REVIEW" "|" "DONE")
+        (sequence "WAITING(w!)" "|" "DONE")
+        (sequence "DELEGATED(d)" "|" "DONE")
+        (sequence "|" "CANCELLED")
+        ))
+
+(setq org-todo-keyword-faces
+      '(("TODO" . "#f1d1a2")
+        ("WAITING" . "#da8548")
+        ("DELEGATED" . "#da8548")
+        ("IN-REVIEW" . "#da8548")
+        ))
+
+
+(defun gn-org/on-todo-change ()
+  (if (s-equals? org-state "DOING")
+      (org-clock-in)
+    (let* ((clocking-todo-state-changed-p
+            (and (org-clocking-p)
+                 (< (point) org-clock-marker)
+                 (> (org-with-wide-buffer (org-entry-end-position))
+                    org-clock-marker))))
+      (when clocking-todo-state-changed-p
+        (org-clock-out)))))
+
+(general-add-hook
+ 'org-after-todo-state-change-hook
+ #'gn-org/on-todo-change)
+
+(defun gn/open-task-inbox ()
+  "Opens the task inbox file. This is where you put all the tasks."
+  (interactive)
+  (find-file (concat org-roam-directory "/todo.org")))
+
 (use-package request)
 
 (defun gn/preview-plantuml-image (encoded-plantuml-code)
@@ -659,6 +674,9 @@ This functions should be added to the 'org-mode-hook'."
 (use-package docker)
 
 (setq dired-dwim-target t)
+
+(general-def '(n i v) 'override
+  "M-z" 'evil-force-normal-state)
 
 (defvar gn/leader-key "SPC")
 
@@ -789,27 +807,24 @@ This functions should be added to the 'org-mode-hook'."
   "M-w" 'with-editor-cancel
   "M-RET" 'with-editor-finish)
 
-(defhydra gn/hydra-org-headline (:color pink :hint nil)
+(defhydra gn-org/hydra (:color pink :hint nil)
   "
-| Navigation^^           | TODO^^           |
-|------------------------+------------------|
-| _j_: next headline     |  |
-| _k_: previous headline | ^^               |
-| _h_: parent headline   | ^^               |
-| ^^                     | ^^               |
-| ^^                     | ^^               |
-| ^^                     | ^^               |
-"
+| Motion^^                  | Agenda^^ |
+|---------------------------+----------|
+| _<down>_ : next headline  |          |
+| _<up>_: previous headline |          |
+| _<left>_: parent headline |          |
+| _f_: goto headline        |          |
+| _c_: goto clocking todo^^ |          |
+  "
   ;; Navigation
-  ("j" org-next-visible-heading)
-  ("k" org-previous-visible-heading)
-  ("h" outline-up-heading)
+  ("<down>" org-next-visible-heading)
+  ("<up>" org-previous-visible-heading)
+  ("<left>" outline-up-heading)
+  ("f" org-goto)
 
   ;; Todo stuff
-  ("J" org-shiftup)
-  ("K" org-shiftdown)
-  ("H" org-shiftleft)
-  ("L" org-shiftright)
+  ("c" org-clock-goto)
 
   ;; Quit
   ("q" nil "quit")
@@ -817,6 +832,7 @@ This functions should be added to the 'org-mode-hook'."
 
 (general-def 'n org-mode-map
   ;; General org-mode usage
+  "S-SPC" 'gn-org/hydra/body
   "RET" 'org-ctrl-c-ctrl-c
   "M-h" 'org-metaleft
   "M-H" 'org-shiftmetaleft
