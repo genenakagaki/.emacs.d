@@ -607,15 +607,13 @@ This functions should be added to the 'org-mode-hook'."
         ("IN-REVIEW" . "#da8548")
         ))
 
-
 (defun gn-org/on-todo-change ()
-  (if (s-equals? org-state "DOING")
-      (org-clock-in)
-    (let* ((clocking-todo-state-changed-p
-            (and (org-clocking-p)
-                 (< (point) org-clock-marker)
-                 (> (org-with-wide-buffer (org-entry-end-position))
-                    org-clock-marker))))
+  (let* ((clocking-todo-state-changed-p
+          (and (org-clocking-p)
+               (< (point) org-clock-marker (org-with-wide-buffer (org-entry-end-position))))))
+    (if (s-equals? org-state "DOING")
+        (when (not (org-clocking-p))
+          (org-clock-in))
       (when clocking-todo-state-changed-p
         (org-clock-out)))))
 
