@@ -501,9 +501,12 @@ This functions should be added to the 'org-mode-hook'."
   ;; Download to a directory
   (setq org-download-method 'directory)
   ;; Don't include heading name in the download directory path
-  (setq org-download-heading-lvl nil)
+  (setq-default org-download-heading-lvl nil)
   ;; The directory to put downloaded images
-  (setq org-download-image-dir nil)
+  ;; Put images in the same directory by default
+  (setq-default org-download-image-dir nil)
+  ;; The timestamp appended to the filename
+  (setq org-download-timestamp "%Y%m%d-%H%M%S-")
 
   ;; Drag-and-drop to `dired`
   (general-add-hook 'dired-mode-hook 'org-download-enable)
@@ -736,13 +739,15 @@ This functions should be added to the 'org-mode-hook'."
 (general-def 'n org-mode-map
   :prefix gn/leader-key
   ;; Insert
-  "in" '(org-roam-node-insert :wk "Org roam node")
-  "ii" '(org-id-store-link :wk "Insert ID")
+  "in" '(org-roam-node-insert :wk "Insert org-roam node")
+  "ii" '(org-id-store-link :wk "Insert node ID")
+  "iI" '(org-download-clipboard :wk "Insert clipboard screenshot")
   "il" '(org-insert-link :wk "Insert link")
 
   ;; Toggle
   "tt" 'gn/hydra-org-headline/body
   "tl" 'org-toggle-link-display
+  "ti" 'org-toggle-inline-images
   "tn" #'org-narrow-to-subtree
   "tw" #'widen
 

@@ -60,17 +60,16 @@
                         (->> -existing-config-target
                              (run! fs/delete))}
   setup-config {:depends [-existing-config-target
-                          delete-config]
+                          config-delete]
                 :task
-                (do (when-net (empty? -existing-config-target)
+                (do (when-not (empty? -existing-config-target)
                       (println "以下のファイルを削除してもいいですか？ (y/n)")
                       (case (first (line-seq (io/reader *in*)))
-                        "y" 
-                        "n")
-                      (if (= "y" )
-                        (println "yes")
-                        (println "no")
-                        )))
+                        "y" (println "yes")
+                        "n" (println "no")))
+                    (->> (config-files)
+                         (run! create-config-symlink))
+                    )
                 }
   config-delete-preview {:depends [-config-source->config-target-m]
                          :task
