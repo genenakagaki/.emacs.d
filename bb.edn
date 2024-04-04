@@ -1,6 +1,7 @@
 {:tasks
  {:requires ([babashka.fs :as fs]
-             [clojure.string :as str])
+             [clojure.string :as s]
+             [clojure.java.io :as io])
   :init (do (defn exit-with-error [error]
               (println "Exited due to error")
               (println error)
@@ -12,7 +13,7 @@
                    (map str)))
 
             (defn config-symlink-path [config-file]
-              (-> (if (str/includes? config-file "homedir")
+              (-> (if (s/includes? config-file "homedir")
                     (str "~/" (fs/file-name config-file))
                     (str "~/." config-file))
                   (fs/expand-home)))
@@ -36,14 +37,60 @@
                 (println "   The file does not exist"))
               (println))
             )
+  -config-source (->> (fs/glob "./config" "**.**" {:hidden true
+                                                   :recursive true})
+                      (map str))
+  -config-source->config-target-m
+  {:depends [-config-source]
+   :task (->> -config-source
+              (map (fn [file]
+                     {:source file
+                      :target (-> (if (s/includes? file "homedir")
+                                    (str "~/" (fs/file-name file))
+                                    (str "~/." file))
+                                  (fs/expand-home)
+                                  (str))})))}
+  -existing-config-target {:depends [-config-source->config-target-m]
+                           :task
+                           (->> -config-source->config-target-m
+                                (map :target)
+                                (filter (fn [target] (fs/exists? target))))}
+  delete-config-target {:depends [-existing-config-target]
+                        :task
+                        (->> -existing-config-target
+                             (run! fs/delete))}
+  setup-config {:depends [-existing-config-target
+                          config-delete]
+                :task
+                (do (when-not (empty? -existing-config-target)
+                      (println "以下のファイルを削除してもいいですか？ (y/n)")
+                      (case (first (line-seq (io/reader *in*)))
+                        "y" (println "yes")
+                        "n" (println "no")))
+                    (->> (config-files)
+                         (run! create-config-symlink))
+                    )
+                }
+  config-delete-preview {:depends [-config-source->config-target-m]
+                         :task
+                         (->> -config-source->config-target-m
+                              (map :target)
+                              (filter (fn [target] (fs/exists? target)))
+                              (run! println))}
+  config-delete {:depends [-config-source->config-target-m]
+                 :task
+                 (->> -config-source->config-target-m
+                      (map :symlink-path)
+                      (filter (fn [symlink] (fs/exists? symlink)))
+                      (run! println))}
   clean-preview (shell "cd ./emacs-preview; rm -rf node_modules")
   install-preview (shell "cd ./emacs-preview; pnpm install")
   clean-config (->> (config-files)
                     (map config-symlink-path)
                     (run! delete-symlink))
-  setup-config (->> (config-files)
-                    (run! create-config-symlink)
-                    )
+  ;; setup-config (->> (config-files)
+  ;;                   (run! create-config-symlink)
+  ;;                   )
   
 
   }}

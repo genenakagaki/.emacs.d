@@ -1,7 +1,7 @@
 # /Users/genenakagaki/.config/tmuxinator/emacs.yml
 
 name: emacs
-root: ~/.emacs.default
+root: ~/.emacs.d
 
 # Optional tmux socket
 # socket_name: foo
