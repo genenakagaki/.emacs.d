@@ -436,12 +436,16 @@ This functions should be added to the 'org-mode-hook'."
                     )))))
 
 (defun gn/org-fold-lines ()
+  (turn-on-visual-line-mode)
+
+
   ;; This needs to be nil on order for 'toggle-truncate-lines' to work.
-  (setq truncate-partial-width-windows nil)
+  ;; (setq truncate-partial-width-windows nil)
 
   ;; Fold long lines.
   ;; This variable is buffer local, so it needs to be set for every buffer
-  (setq truncate-lines nil))
+  ;; (setq truncate-lines nil)
+  )
 
 (use-package org
   :gfhook 
@@ -535,7 +539,7 @@ This functions should be added to the 'org-mode-hook'."
 #+language: en
 #+title: ${title}
 
-* {{{title}}}")
+* Description")
            :immediate-finish
            :jump-to-captured)))
 
@@ -687,7 +691,9 @@ This functions should be added to the 'org-mode-hook'."
 
 (general-def 'n 'override
   "j" 'evil-next-visual-line
-  "k" 'evil-previous-visual-line)
+  "k" 'evil-previous-visual-line
+  "<down>" 'evil-next-visual-line
+  "<up>" 'evil-previous-visual-line)
 
 (general-def '(n i)
   ;; Make similar experience with MacOS
