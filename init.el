@@ -16,6 +16,7 @@
 (setq confirm-kill-emacs 'yes-or-no-p)
 
 ;; Show line numbers
+(setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode t)
 
 ;; Highlight current line

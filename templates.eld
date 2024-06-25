@@ -157,12 +157,10 @@ org-mode
 
 plantuml-mode
 
-(uml "@startuml 
-<style>
-diamond {
-    BackgroundColor business
-}
-</style> 
+(activity "@startuml 
+skinparam ActivityBackgroundColor business
+skinparam ActivityDiamondBackgroundColor business
+
 
 legend top
     <back:application>システムの処理</back> 
