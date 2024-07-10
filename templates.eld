@@ -160,7 +160,18 @@ plantuml-mode
 (activity "@startuml 
 skinparam ActivityBackgroundColor business
 skinparam ActivityDiamondBackgroundColor business
+skinparam ConditionEndStyle hline
 
+legend top
+    <back:application>システムの処理</back> 
+    <back:business>会員アクション</back> 
+    <back:palegreen>まだ考慮する必要あり</back> 
+endlegend
+@enduml")
+(deployment "@startuml 
+skinparam ActivityBackgroundColor business
+skinparam ActivityDiamondBackgroundColor business
+skinparam ConditionEndStyle hline
 
 legend top
     <back:application>システムの処理</back> 
@@ -182,7 +193,7 @@ end split"
 (error "#pink:エラー;" n>
        "stop")
 (font "<color:" p ">" q "</color>")
-(note "note left" n
+(note "note right" n
       > q n
       "end note"
       :post (indent-buffer))
