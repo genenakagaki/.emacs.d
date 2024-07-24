@@ -417,24 +417,54 @@ This functions should be added to the 'org-mode-hook'."
   (add-to-list 'org-tab-first-hook 'yas/org-very-safe-expand)
   (define-key yas/keymap [tab] 'yas/next-field))
 
-(defun gn/org-dwim-at-point ()
-  (interactive)
-  (message "gn/org-dwim-at-point")
+(defun gn/org-log-element-at-point ()
+  (message "
+Logging org elements at point...")
   (let* ((element (org-element-at-point))
          (context (org-element-context)))
-    (message "org-element-at-point")
+    (message "
+org-element-at-point")
     (pp element)
-    (message "org-element-context")
+    (message "
+org-element-context")
     (pp context)
-    (message "org-element-contents")
+    (message "
+org-element-contents")
     (pp (org-element-contents element))
-    (message "org-element-type")
+    (message "
+org-element-type")
     (pp (org-element-type element))
+    ))
 
-    (pcase (-first-item element)
-      ('paragraph (let* ((parent (org-element-property :parent paragraph)))
-                    (message "at paragraph")
-                    )))))
+(defun gn/org-dwim-at-point ()
+  (interactive)
+
+  (let* ((context (org-element-context))
+         (element-type (org-element-type context))
+         (debug-p nil))
+    (when debug-p
+      (message "
+
+Running gn/org-dwim-at-point function...")
+      (gn/org-log-element-at-point))
+    (pcase element-type 
+      ;; ('paragraph (let* ((parent (org-element-property :parent context)))
+      ;;               (when (and (eq (org-element-type parent) 'item)
+      ;;                          (org-element-property :checkbox parent))
+      ;;                 ;; toggle checkbox if checkbox
+      ;;                 (org-ctrl-c-ctrl-c))))
+      ('src-block (org-edit-special))
+      ('link (org-open-at-point))
+
+      (element (org-ctrl-c-ctrl-c))
+      )
+    (when debug-p
+      (message "gn/org-dwim-at-point finished"))))
+
+(pcase 'test
+  ((and 'testaa)
+   (message "hello"))
+  )
 
 (defun gn/org-fold-lines ()
   (turn-on-visual-line-mode)
@@ -848,11 +878,12 @@ This functions should be added to the 'org-mode-hook'."
 (general-def 'n org-mode-map
   ;; General org-mode usage
   "S-SPC" 'gn-org/hydra/body
-  "RET" 'org-ctrl-c-ctrl-c
+  "RET" 'gn/org-dwim-at-point
   "M-h" 'org-metaleft
   "M-H" 'org-shiftmetaleft
   "M-l" 'org-metaright
-  "M-L" 'org-shiftmetaright)
+  "M-L" 'org-shiftmetaright
+  "C-M-g" 'gn/org-dwim-at-point)
 
 ;; Source mode map
 (general-def 'n org-src-mode-map

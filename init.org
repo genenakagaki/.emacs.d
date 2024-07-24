@@ -560,25 +560,54 @@ Tempel
 
 My functions
 #+begin_src emacs-lisp :tangle yes :results none
+  (defun gn/org-log-element-at-point ()
+    (message "
+  Logging org elements at point...")
+    (let* ((element (org-element-at-point))
+           (context (org-element-context)))
+      (message "
+  org-element-at-point")
+      (pp element)
+      (message "
+  org-element-context")
+      (pp context)
+      (message "
+  org-element-contents")
+      (pp (org-element-contents element))
+      (message "
+  org-element-type")
+      (pp (org-element-type element))
+      ))
 
   (defun gn/org-dwim-at-point ()
     (interactive)
-    (message "gn/org-dwim-at-point")
-    (let* ((element (org-element-at-point))
-           (context (org-element-context)))
-      (message "org-element-at-point")
-      (pp element)
-      (message "org-element-context")
-      (pp context)
-      (message "org-element-contents")
-      (pp (org-element-contents element))
-      (message "org-element-type")
-      (pp (org-element-type element))
+  
+    (let* ((context (org-element-context))
+           (element-type (org-element-type context))
+           (debug-p nil))
+      (when debug-p
+        (message "
 
-      (pcase (-first-item element)
-        ('paragraph (let* ((parent (org-element-property :parent paragraph)))
-                      (message "at paragraph")
-                      )))))
+  Running gn/org-dwim-at-point function...")
+        (gn/org-log-element-at-point))
+      (pcase element-type 
+        ;; ('paragraph (let* ((parent (org-element-property :parent context)))
+        ;;               (when (and (eq (org-element-type parent) 'item)
+        ;;                          (org-element-property :checkbox parent))
+        ;;                 ;; toggle checkbox if checkbox
+        ;;                 (org-ctrl-c-ctrl-c))))
+        ('src-block (org-edit-special))
+        ('link (org-open-at-point))
+
+        (element (org-ctrl-c-ctrl-c))
+        )
+      (when debug-p
+        (message "gn/org-dwim-at-point finished"))))
+
+  (pcase 'test
+    ((and 'testaa)
+     (message "hello"))
+    )
 
   (defun gn/org-fold-lines ()
     (turn-on-visual-line-mode)
@@ -1059,6 +1088,7 @@ hydra-headline
 | _<left>_: parent headline^^ |          |
 | _f_: goto headline^^        |          |
 | _c_: goto clocking todo^^   |          |
+
 #+begin_src emacs-lisp :tangle yes
   (defhydra gn-org/hydra (:color pink :hint nil)
     "
@@ -1086,11 +1116,12 @@ hydra-headline
   (general-def 'n org-mode-map
     ;; General org-mode usage
     "S-SPC" 'gn-org/hydra/body
-    "RET" 'org-ctrl-c-ctrl-c
+    "RET" 'gn/org-dwim-at-point
     "M-h" 'org-metaleft
     "M-H" 'org-shiftmetaleft
     "M-l" 'org-metaright
-    "M-L" 'org-shiftmetaright)
+    "M-L" 'org-shiftmetaright
+    "C-M-g" 'gn/org-dwim-at-point)
 
   ;; Source mode map
   (general-def 'n org-src-mode-map
@@ -1100,6 +1131,8 @@ hydra-headline
     "M-w" 'org-edit-src-abort
     "M-q" 'save-buffers-kill-terminal)
 #+end_src
+
+#+RESULTS:
 
 *** PlantUML
 #+begin_src emacs-lisp :tangle yes
