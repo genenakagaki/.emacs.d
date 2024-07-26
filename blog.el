@@ -58,24 +58,158 @@
 ;;; Define Back-End
 
 
-  ;; '((bold . "<b>%s</b>")
-  ;;   (code . "<code>%s</code>")
-  ;;   (italic . "<i>%s</i>")
-  ;;   (strike-through . "<del>%s</del>")
-  ;;   (underline . "<span class=\"underline\">%s</span>")
-  ;;   (verbatim . "<code>%s</code>"))
+;; '((bold . "<b>%s</b>")
+;;   (code . "<code>%s</code>")
+;;   (italic . "<i>%s</i>")
+;;   (strike-through . "<del>%s</del>")
+;;   (underline . "<span class=\"underline\">%s</span>")
+;;   (verbatim . "<code>%s</code>"))
 
 (format "[:b %S]" "testing")
 
 (defun gn/blog-render-bold (_bold contents _info)
   (format "[:b %S]" contents))
 
-(defun gn/blog-render-center-block (_center-block contents _info)
-  ;; TODO Implement this
+(defun gn/blog-render-center-block (center-block contents info)
   nil)
 
-(defun gn/blog-render-code (_code contents _info)
-  (format "[: %S]" contents))
+(defun gn/blog-render-clock (clock contents info) 
+  nil)
+
+(defun gn/blog-render-code (code contents info) 
+  (format "[:code %S]" contents))
+
+(defun gn/blog-render-drawer (drawer contents info) 
+  (format "[:drawer %S]" contents))
+
+(defun gn/blog-render-dynamic-block (dynamic-block contents info) 
+  (format "[:dynamic-block %S]" contents))
+
+(defun gn/blog-render-entity (entity contents info) 
+  (format "[:entity %S]" contents))
+
+(defun gn/blog-render-example-block (example-block contents info) 
+  (format "[:example-block %S]" contents))
+
+(defun gn/blog-render-export-block (export-block contents info) 
+  (format "[:export-block %S]" contents))
+
+(defun gn/blog-render-export-snippet (export-snippet contents info) 
+  (format "[:export-snippet %S]" contents))
+
+(defun gn/blog-render-fixed-width (fixed-width contents info) 
+  (format "[:fixed-width %S]" contents))
+
+(defun gn/blog-render-footnote-reference (footnote-reference contents info) 
+  (format "[:footnote-reference %S]" contents))
+
+(defun gn/blog-render-headline (headline contents info) 
+  (format "[:headline %S]" contents))
+
+(defun gn/blog-render-horizontal-rule (horizontal-rule contents info) 
+  (format "[:horizontal-rule %S]" contents))
+
+(defun gn/blog-render-inline-src-block (inline-src-block contents info) 
+  (format "[:inline-src-block %S]" contents))
+
+(defun gn/blog-render-inlinetask (inlinetask contents info) 
+  (format "[:inlinetask %S]" contents))
+
+(defun gn/blog-render-inner-template (inner-template contents info) 
+  (format "[:inner-template %S]" contents))
+
+(defun gn/blog-render-italic (italic contents info) 
+  (format "[:italic %S]" contents))
+
+(defun gn/blog-render-item (item contents info) 
+  (format "[:item %S]" contents))
+
+(defun gn/blog-render-keyword (keyword contents info) 
+  (format "[:keyword %S]" contents))
+
+(defun gn/blog-render-latex-environment (latex-environment contents info) 
+  (format "[:latex-environment %S]" contents))
+
+(defun gn/blog-render-latex-fragment (latex-fragment contents info) 
+  (format "[:latex-fragment %S]" contents))
+
+(defun gn/blog-render-line-break (line-break contents info) 
+  (format "[:line-break %S]" contents))
+
+(defun gn/blog-render-link (link contents info) 
+  (format "[:link %S]" contents))
+
+(defun gn/blog-render-node-property (node-property contents info) 
+  (format "[:node-property %S]" contents))
+
+(defun gn/blog-render-paragraph (paragraph contents info) 
+  (format "[:paragraph %S]" contents))
+
+(defun gn/blog-render-plain-list (plain-list contents info) 
+  (format "[:plain-list %S]" contents))
+
+(defun gn/blog-render-plain-text (plain-text contents info) 
+  (format "[:plain-text %S]" contents))
+
+(defun gn/blog-render-planning (planning contents info) 
+  (format "[:planning %S]" contents))
+
+(defun gn/blog-render-property-drawer (property-drawer contents info) 
+  (format "[:property-drawer %S]" contents))
+
+(defun gn/blog-render-quote-block (quote-block contents info) 
+  (format "[:quote-block %S]" contents))
+
+(defun gn/blog-render-radio-target (radio-target contents info) 
+  (format "[:radio-target %S]" contents))
+
+(defun gn/blog-render-section (section contents info) 
+  (format "[:section %S]" contents))
+
+(defun gn/blog-render-special-block (special-block contents info) 
+  (format "[:special-block %S]" contents))
+
+(defun gn/blog-render-src-block (src-block contents info) 
+  (format "[:src-block %S]" contents))
+
+(defun gn/blog-render-statistics-cookie (statistics-cookie contents info) 
+  (format "[:statistics-cookie %S]" contents))
+
+(defun gn/blog-render-strike-through (strike-through contents info) 
+  (format "[:strike-through %S]" contents))
+
+(defun gn/blog-render-subscript (subscript contents info) 
+  (format "[:subscript %S]" contents))
+
+(defun gn/blog-render-superscript (superscript contents info) 
+  (format "[:superscript %S]" contents))
+
+(defun gn/blog-render-table (table contents info) 
+  (format "[:table %S]" contents))
+
+(defun gn/blog-render-table-cell (table-cell contents info) 
+  (format "[:table-cell %S]" contents))
+
+(defun gn/blog-render-table-row (table-row contents info) 
+  (format "[:table-row %S]" contents))
+
+(defun gn/blog-render-target (target contents info) 
+  (format "[:target %S]" contents))
+
+(defun gn/blog-render-template (template contents info) 
+  (format "[:template %S]" contents))
+
+(defun gn/blog-render-timestamp (timestamp contents info) 
+  (format "[:timestamp %S]" contents))
+
+(defun gn/blog-render-underline (underline contents info) 
+  (format "[:underline %S]" contents))
+
+(defun gn/blog-render-verbatim (verbatim contents info) 
+  (format "[:verbatim %S]" contents))
+
+(defun gn/blog-render-verse-block (verse-block contents info) 
+  (format "[:verse-block %S]" contents))
 
 (org-export-define-backend 'blog
   '((bold . org-html-bold)
@@ -583,10 +717,10 @@ export back-end currently used."
 	       ;; Compute default values for script option OPT from
 	       ;; `org-html-infojs-options' variable.
 	       (default
-		 (let ((default (cdr (assq opt infojs-opt))))
-		   (if (and (symbolp default) (not (memq default '(t nil))))
-		       (plist-get exp-plist default)
-		     default)))
+		(let ((default (cdr (assq opt infojs-opt))))
+		  (if (and (symbolp default) (not (memq default '(t nil))))
+		      (plist-get exp-plist default)
+		    default)))
 	       ;; Value set through INFOJS_OPT keyword has precedence
 	       ;; over the default one.
 	       (val (if (and options
@@ -1881,36 +2015,36 @@ INFO is a plist used as a communication channel."
   (pcase (org-export-collect-footnote-definitions info)
     (`nil nil)
     (definitions
+     (format
+      (plist-get info :html-footnotes-section)
+      (org-html--translate "Footnotes" info)
       (format
-       (plist-get info :html-footnotes-section)
-       (org-html--translate "Footnotes" info)
-       (format
-	"\n%s\n"
-	(mapconcat
-	 (lambda (definition)
-	   (pcase definition
-	     (`(,n ,_ ,def)
-	      ;; `org-export-collect-footnote-definitions' can return
-	      ;; two kinds of footnote definitions: inline and blocks.
-	      ;; Since this should not make any difference in the HTML
-	      ;; output, we wrap the inline definitions within
-	      ;; a "footpara" class paragraph.
-	      (let ((inline? (not (org-element-map def org-element-all-elements
-				    #'identity nil t)))
-		    (anchor (org-html--anchor
-			     (format "fn.%d" n)
-			     n
-			     (format " class=\"footnum\" href=\"#fnr.%d\" role=\"doc-backlink\"" n)
-			     info))
-		    (contents (org-trim (org-export-data def info))))
-		(format "<div class=\"footdef\">%s %s</div>\n"
-			(format (plist-get info :html-footnote-format) anchor)
-			(format "<div class=\"footpara\" role=\"doc-footnote\">%s</div>"
-				(if (not inline?) contents
-				  (format "<p class=\"footpara\">%s</p>"
-					  contents))))))))
-	 definitions
-	 "\n"))))))
+       "\n%s\n"
+       (mapconcat
+	(lambda (definition)
+	  (pcase definition
+	    (`(,n ,_ ,def)
+	     ;; `org-export-collect-footnote-definitions' can return
+	     ;; two kinds of footnote definitions: inline and blocks.
+	     ;; Since this should not make any difference in the HTML
+	     ;; output, we wrap the inline definitions within
+	     ;; a "footpara" class paragraph.
+	     (let ((inline? (not (org-element-map def org-element-all-elements
+				   #'identity nil t)))
+		   (anchor (org-html--anchor
+			    (format "fn.%d" n)
+			    n
+			    (format " class=\"footnum\" href=\"#fnr.%d\" role=\"doc-backlink\"" n)
+			    info))
+		   (contents (org-trim (org-export-data def info))))
+	       (format "<div class=\"footdef\">%s %s</div>\n"
+		       (format (plist-get info :html-footnote-format) anchor)
+		       (format "<div class=\"footpara\" role=\"doc-footnote\">%s</div>"
+			       (if (not inline?) contents
+				 (format "<p class=\"footpara\">%s</p>"
+					 contents))))))))
+	definitions
+	"\n"))))))
 
 
 ;;; Template

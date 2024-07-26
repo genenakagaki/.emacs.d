@@ -454,6 +454,7 @@ Running gn/org-dwim-at-point function...")
       ;;                 ;; toggle checkbox if checkbox
       ;;                 (org-ctrl-c-ctrl-c))))
       ('src-block (org-edit-special))
+      ('example-block (org-edit-special))
       ('link (org-open-at-point))
 
       (element (org-ctrl-c-ctrl-c))
