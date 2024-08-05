@@ -65,287 +65,333 @@
 ;;   (underline . "<span class=\"underline\">%s</span>")
 ;;   (verbatim . "<code>%s</code>"))
 
-(format "[:b %S]" "testing")
+(defun gn/blog-render-unsupported (element-type)
+  (message (format "gn/blog-render %s not supported" element-type)))
 
 (defun gn/blog-render-bold (_bold contents _info)
   (format "[:b %S]" contents))
 
 (defun gn/blog-render-center-block (center-block contents info)
-  nil)
+  (gn/blog-render-unsupported "center-block"))
 
 (defun gn/blog-render-clock (clock contents info) 
-  nil)
+  (gn/blog-render-unsupported "clock"))
 
 (defun gn/blog-render-code (code contents info) 
   (format "[:code %S]" contents))
 
 (defun gn/blog-render-drawer (drawer contents info) 
-  (format "[:drawer %S]" contents))
+  (gn/blog-render-unsupported "drawer"))
 
 (defun gn/blog-render-dynamic-block (dynamic-block contents info) 
-  (format "[:dynamic-block %S]" contents))
+  (gn/blog-render-unsupported "dynamic-block"))
 
 (defun gn/blog-render-entity (entity contents info) 
-  (format "[:entity %S]" contents))
+  (gn/blog-render-unsupported "entity"))
 
 (defun gn/blog-render-example-block (example-block contents info) 
   (format "[:example-block %S]" contents))
 
 (defun gn/blog-render-export-block (export-block contents info) 
-  (format "[:export-block %S]" contents))
+  (gn/blog-render-unsupported "export-block"))
 
 (defun gn/blog-render-export-snippet (export-snippet contents info) 
-  (format "[:export-snippet %S]" contents))
+  (gn/blog-render-unsupported "export-snippet"))
 
 (defun gn/blog-render-fixed-width (fixed-width contents info) 
-  (format "[:fixed-width %S]" contents))
+  (gn/blog-render-unsupported "fixed-width"))
 
 (defun gn/blog-render-footnote-reference (footnote-reference contents info) 
-  (format "[:footnote-reference %S]" contents))
+  (gn/blog-render-unsupported "footnote-reference"))
 
 (defun gn/blog-render-headline (headline contents info) 
   (format "[:headline %S]" contents))
 
 (defun gn/blog-render-horizontal-rule (horizontal-rule contents info) 
-  (format "[:horizontal-rule %S]" contents))
+  (format "[:hr %S]" contents))
 
 (defun gn/blog-render-inline-src-block (inline-src-block contents info) 
-  (format "[:inline-src-block %S]" contents))
+  (format "[:code %S]" contents))
 
 (defun gn/blog-render-inlinetask (inlinetask contents info) 
-  (format "[:inlinetask %S]" contents))
+  (gn/blog-render-unsupported "inlinetask"))
 
 (defun gn/blog-render-inner-template (inner-template contents info) 
-  (format "[:inner-template %S]" contents))
+  (gn/blog-render-unsupported "inner-template"))
 
 (defun gn/blog-render-italic (italic contents info) 
-  (format "[:italic %S]" contents))
+  (format "[:i %S]" contents))
 
 (defun gn/blog-render-item (item contents info) 
-  (format "[:item %S]" contents))
+  (format "[:li %S]" contents))
 
 (defun gn/blog-render-keyword (keyword contents info) 
-  (format "[:keyword %S]" contents))
+  (gn/blog-render-unsupported "keyword"))
 
 (defun gn/blog-render-latex-environment (latex-environment contents info) 
-  (format "[:latex-environment %S]" contents))
+  (gn/blog-render-unsupported "latex-environment"))
 
 (defun gn/blog-render-latex-fragment (latex-fragment contents info) 
-  (format "[:latex-fragment %S]" contents))
+  (gn/blog-render-unsupported "latex-fragment"))
 
 (defun gn/blog-render-line-break (line-break contents info) 
-  (format "[:line-break %S]" contents))
+  (format "[:br ]" contents))
 
 (defun gn/blog-render-link (link contents info) 
-  (format "[:link %S]" contents))
+  (message "rendering link")
+  (pp info)
+  (format "[:a %S]" contents))
 
 (defun gn/blog-render-node-property (node-property contents info) 
-  (format "[:node-property %S]" contents))
+  (gn/blog-render-unsupported "node-property"))
 
 (defun gn/blog-render-paragraph (paragraph contents info) 
-  (format "[:paragraph %S]" contents))
+  (format "[:p %S]" contents))
 
 (defun gn/blog-render-plain-list (plain-list contents info) 
-  (format "[:plain-list %S]" contents))
+  (format "[:ul %S]" contents))
 
 (defun gn/blog-render-plain-text (plain-text contents info) 
-  (format "[:plain-text %S]" contents))
+  contents)
 
 (defun gn/blog-render-planning (planning contents info) 
-  (format "[:planning %S]" contents))
+  (gn/blog-render-unsupported "planning"))
 
 (defun gn/blog-render-property-drawer (property-drawer contents info) 
-  (format "[:property-drawer %S]" contents))
+  (gn/blog-render-unsupported "property-drawer"))
 
 (defun gn/blog-render-quote-block (quote-block contents info) 
-  (format "[:quote-block %S]" contents))
+  (format "[:block-quote %S]" contents))
 
 (defun gn/blog-render-radio-target (radio-target contents info) 
-  (format "[:radio-target %S]" contents))
+  (gn/blog-render-unsupported "radio-target"))
 
 (defun gn/blog-render-section (section contents info) 
-  (format "[:section %S]" contents))
+  (message "rendering section")
+  (pp contents)
+  nil)
 
 (defun gn/blog-render-special-block (special-block contents info) 
-  (format "[:special-block %S]" contents))
+  (gn/blog-render-unsupported "special-block"))
 
 (defun gn/blog-render-src-block (src-block contents info) 
-  (format "[:src-block %S]" contents))
+  (format "[:code %S]" contents))
 
 (defun gn/blog-render-statistics-cookie (statistics-cookie contents info) 
-  (format "[:statistics-cookie %S]" contents))
+  (gn/blog-render-unsupported "statistic-cookie"))
 
 (defun gn/blog-render-strike-through (strike-through contents info) 
-  (format "[:strike-through %S]" contents))
+  (format "[:del %S]" contents))
 
 (defun gn/blog-render-subscript (subscript contents info) 
-  (format "[:subscript %S]" contents))
+  (format "[:sub %S]" contents))
 
 (defun gn/blog-render-superscript (superscript contents info) 
-  (format "[:superscript %S]" contents))
+  (format "[:sup %S]" contents))
 
 (defun gn/blog-render-table (table contents info) 
   (format "[:table %S]" contents))
 
 (defun gn/blog-render-table-cell (table-cell contents info) 
-  (format "[:table-cell %S]" contents))
+  (format "[:td %S]" contents))
 
 (defun gn/blog-render-table-row (table-row contents info) 
-  (format "[:table-row %S]" contents))
+  (format "[:tr %S]" contents))
 
 (defun gn/blog-render-target (target contents info) 
-  (format "[:target %S]" contents))
+  (gn/blog-render-unsupported "target"))
 
 (defun gn/blog-render-template (template contents info) 
-  (format "[:template %S]" contents))
+  (gn/blog-render-unsupported "template"))
 
 (defun gn/blog-render-timestamp (timestamp contents info) 
-  (format "[:timestamp %S]" contents))
+  (gn/blog-render-unsupported "timestamp"))
 
 (defun gn/blog-render-underline (underline contents info) 
-  (format "[:underline %S]" contents))
+  (format "[:span.underline %S]" contents))
 
 (defun gn/blog-render-verbatim (verbatim contents info) 
-  (format "[:verbatim %S]" contents))
+  (format "[:code %S]" contents))
 
 (defun gn/blog-render-verse-block (verse-block contents info) 
-  (format "[:verse-block %S]" contents))
+  (gn/blog-render-unsupported "verse-block"))
+
+(defun gn/blog-export-as-blog
+    (&optional async subtreep visible-only body-only ext-plist)
+  "Export current buffer to an HTML buffer.
+
+If narrowing is active in the current buffer, only export its
+narrowed part.
+
+If a region is active, export that region.
+
+A non-nil optional argument ASYNC means the process should happen
+asynchronously.  The resulting buffer should be accessible
+through the `org-export-stack' interface.
+
+When optional argument SUBTREEP is non-nil, export the sub-tree
+at point, extracting information from the headline properties
+first.
+
+When optional argument VISIBLE-ONLY is non-nil, don't export
+contents of hidden elements.
+
+When optional argument BODY-ONLY is non-nil, only write code
+between \"<body>\" and \"</body>\" tags.
+
+EXT-PLIST, when provided, is a property list with external
+parameters overriding Org default settings, but still inferior to
+file-local settings.
+
+Export is done in a buffer named \"*Org HTML Export*\", which
+will be displayed when `org-export-show-temporary-export-buffer'
+is non-nil."
+  (interactive)
+  (message "
+
+
+Running gn/blog-export-as-blog...")
+  (org-export-to-buffer 'blog "*Org BLOG Export*"
+    async subtreep visible-only body-only ext-plist
+    (lambda () (set-auto-mode t))))
 
 (org-export-define-backend 'blog
-  '((bold . org-html-bold)
-    (center-block . org-html-center-block)
-    (clock . org-html-clock)
-    (code . org-html-code)
-    (drawer . org-html-drawer)
-    (dynamic-block . org-html-dynamic-block)
-    (entity . org-html-entity)
-    (example-block . org-html-example-block)
-    (export-block . org-html-export-block)
-    (export-snippet . org-html-export-snippet)
-    (fixed-width . org-html-fixed-width)
-    (footnote-reference . org-html-footnote-reference)
-    (headline . org-html-headline)
-    (horizontal-rule . org-html-horizontal-rule)
-    (inline-src-block . org-html-inline-src-block)
-    (inlinetask . org-html-inlinetask)
-    (inner-template . org-html-inner-template)
-    (italic . org-html-italic)
-    (item . org-html-item)
-    (keyword . org-html-keyword)
-    (latex-environment . org-html-latex-environment)
-    (latex-fragment . org-html-latex-fragment)
-    (line-break . org-html-line-break)
-    (link . org-html-link)
-    (node-property . org-html-node-property)
-    (paragraph . org-html-paragraph)
-    (plain-list . org-html-plain-list)
-    (plain-text . org-html-plain-text)
-    (planning . org-html-planning)
-    (property-drawer . org-html-property-drawer)
-    (quote-block . org-html-quote-block)
-    (radio-target . org-html-radio-target)
-    (section . org-html-section)
-    (special-block . org-html-special-block)
-    (src-block . org-html-src-block)
-    (statistics-cookie . org-html-statistics-cookie)
-    (strike-through . org-html-strike-through)
-    (subscript . org-html-subscript)
-    (superscript . org-html-superscript)
-    (table . org-html-table)
-    (table-cell . org-html-table-cell)
-    (table-row . org-html-table-row)
-    (target . org-html-target)
-    (template . org-html-template)
-    (timestamp . org-html-timestamp)
-    (underline . org-html-underline)
-    (verbatim . org-html-verbatim)
-    (verse-block . org-html-verse-block))
+  '((bold . gn/blog-render-bold)
+    (center-block . gn/blog-render-center-block)
+    (clock . gn/blog-render-clock)
+    (code . gn/blog-render-code)
+    (drawer . gn/blog-render-drawer)
+    (dynamic-block . gn/blog-render-dynamic-block)
+    (entity . gn/blog-render-entity)
+    (example-block . gn/blog-render-example-block)
+    (export-block . gn/blog-render-export-block)
+    (export-snippet . gn/blog-render-export-snippet)
+    (fixed-width . gn/blog-render-fixed-width)
+    (footnote-reference . gn/blog-render-footnote-reference)
+    (headline . gn/blog-render-headline)
+    (horizontal-rule . gn/blog-render-horizontal-rule)
+    (inline-src-block . gn/blog-render-inline-src-block)
+    (inlinetask . gn/blog-render-inlinetask)
+    (inner-template . gn/blog-render-inner-template)
+    (italic . gn/blog-render-italic)
+    (item . gn/blog-render-item)
+    (keyword . gn/blog-render-keyword)
+    (latex-environment . gn/blog-render-latex-environment)
+    (latex-fragment . gn/blog-render-latex-fragment)
+    (line-break . gn/blog-render-line-break)
+    (link . gn/blog-render-link)
+    (node-property . gn/blog-render-node-property)
+    (paragraph . gn/blog-render-paragraph)
+    (plain-list . gn/blog-render-plain-list)
+    (plain-text . gn/blog-render-plain-text)
+    (planning . gn/blog-render-planning)
+    (property-drawer . gn/blog-render-property-drawer)
+    (quote-block . gn/blog-render-quote-block)
+    (radio-target . gn/blog-render-radio-target)
+    (section . gn/blog-render-section)
+    (special-block . gn/blog-render-special-block)
+    (src-block . gn/blog-render-src-block)
+    (statistics-cookie . gn/blog-render-statistics-cookie)
+    (strike-through . gn/blog-render-strike-through)
+    (subscript . gn/blog-render-subscript)
+    (superscript . gn/blog-render-superscript)
+    (table . gn/blog-render-table)
+    (table-cell . gn/blog-render-table-cell)
+    (table-row . gn/blog-render-table-row)
+    (target . gn/blog-render-target)
+    (template . gn/blog-render-template)
+    (timestamp . gn/blog-render-timestamp)
+    (underline . gn/blog-render-underline)
+    (verbatim . gn/blog-render-verbatim)
+    (verse-block . gn/blog-render-verse-block))
   :filters-alist '((:filter-options . org-html-infojs-install-script)
 		   (:filter-parse-tree . org-html-image-link-filter)
 		   (:filter-final-output . org-html-final-function))
   :menu-entry
-  '(?h "Export to HTML"
-       ((?H "As HTML buffer" org-html-export-as-html)
-	(?h "As HTML file" org-html-export-to-html)
-	(?o "As HTML file and open"
+  '(?h "Export to BLOG"
+       ((?H "As BLOG buffer" org-html-export-as-html)
+	(?h "As BLOG file" org-html-export-to-html)
+	(?o "As BLOG file and open"
 	    (lambda (a s v b)
 	      (if a (org-html-export-to-html t s v b)
 		(org-open-file (org-html-export-to-html nil s v b)))))))
   :options-alist
-  '((:html-doctype "HTML_DOCTYPE" nil org-html-doctype)
-    (:html-container "HTML_CONTAINER" nil org-html-container-element)
-    (:html-content-class "HTML_CONTENT_CLASS" nil org-html-content-class)
-    (:description "DESCRIPTION" nil nil newline)
-    (:keywords "KEYWORDS" nil nil space)
-    (:html-html5-fancy nil "html5-fancy" org-html-html5-fancy)
-    (:html-link-use-abs-url nil "html-link-use-abs-url" org-html-link-use-abs-url)
-    (:html-link-home "HTML_LINK_HOME" nil org-html-link-home)
-    (:html-link-up "HTML_LINK_UP" nil org-html-link-up)
-    (:html-mathjax "HTML_MATHJAX" nil "" space)
-    (:html-equation-reference-format "HTML_EQUATION_REFERENCE_FORMAT" nil org-html-equation-reference-format t)
-    (:html-postamble nil "html-postamble" org-html-postamble)
-    (:html-preamble nil "html-preamble" org-html-preamble)
-    (:html-head "HTML_HEAD" nil org-html-head newline)
-    (:html-head-extra "HTML_HEAD_EXTRA" nil org-html-head-extra newline)
-    (:subtitle "SUBTITLE" nil nil parse)
-    (:html-head-include-default-style
-     nil "html-style" org-html-head-include-default-style)
-    (:html-head-include-scripts nil "html-scripts" org-html-head-include-scripts)
-    (:html-allow-name-attribute-in-anchors
-     nil nil org-html-allow-name-attribute-in-anchors)
-    (:html-divs nil nil org-html-divs)
-    (:html-checkbox-type nil nil org-html-checkbox-type)
-    (:html-extension nil nil org-html-extension)
-    (:html-footnote-format nil nil org-html-footnote-format)
-    (:html-footnote-separator nil nil org-html-footnote-separator)
-    (:html-footnotes-section nil nil org-html-footnotes-section)
-    (:html-format-drawer-function nil nil org-html-format-drawer-function)
-    (:html-format-headline-function nil nil org-html-format-headline-function)
-    (:html-format-inlinetask-function
-     nil nil org-html-format-inlinetask-function)
-    (:html-home/up-format nil nil org-html-home/up-format)
-    (:html-indent nil nil org-html-indent)
-    (:html-infojs-options nil nil org-html-infojs-options)
-    (:html-infojs-template nil nil org-html-infojs-template)
-    (:html-inline-image-rules nil nil org-html-inline-image-rules)
-    (:html-link-org-files-as-html nil nil org-html-link-org-files-as-html)
-    (:html-mathjax-options nil nil org-html-mathjax-options)
-    (:html-mathjax-template nil nil org-html-mathjax-template)
-    (:html-metadata-timestamp-format nil nil org-html-metadata-timestamp-format)
-    (:html-postamble-format nil nil org-html-postamble-format)
-    (:html-preamble-format nil nil org-html-preamble-format)
-    (:html-prefer-user-labels nil nil org-html-prefer-user-labels)
-    (:html-self-link-headlines nil nil org-html-self-link-headlines)
-    (:html-table-align-individual-fields
-     nil nil org-html-table-align-individual-fields)
-    (:html-table-caption-above nil nil org-html-table-caption-above)
-    (:html-table-data-tags nil nil org-html-table-data-tags)
-    (:html-table-header-tags nil nil org-html-table-header-tags)
-    (:html-table-use-header-tags-for-first-column
-     nil nil org-html-table-use-header-tags-for-first-column)
-    (:html-tag-class-prefix nil nil org-html-tag-class-prefix)
-    (:html-text-markup-alist nil nil org-html-text-markup-alist)
-    (:html-todo-kwd-class-prefix nil nil org-html-todo-kwd-class-prefix)
-    (:html-toplevel-hlevel nil nil org-html-toplevel-hlevel)
-    (:html-use-infojs nil nil org-html-use-infojs)
-    (:html-validation-link nil nil org-html-validation-link)
-    (:html-viewport nil nil org-html-viewport)
-    (:html-inline-images nil nil org-html-inline-images)
-    (:html-table-attributes nil nil org-html-table-default-attributes)
-    (:html-table-row-open-tag nil nil org-html-table-row-open-tag)
-    (:html-table-row-close-tag nil nil org-html-table-row-close-tag)
-    (:html-xml-declaration nil nil org-html-xml-declaration)
-    (:html-wrap-src-lines nil nil org-html-wrap-src-lines)
-    (:html-klipsify-src nil nil org-html-klipsify-src)
-    (:html-klipse-css nil nil org-html-klipse-css)
-    (:html-klipse-js nil nil org-html-klipse-js)
-    (:html-klipse-selection-script nil nil org-html-klipse-selection-script)
-    (:infojs-opt "INFOJS_OPT" nil nil)
-    ;; Redefine regular options.
-    (:creator "CREATOR" nil org-html-creator-string)
-    (:with-latex nil "tex" org-html-with-latex)
-    ;; Retrieve LaTeX header for fragments.
-    (:latex-header "LATEX_HEADER" nil nil newline)))
+  nil
+  ;; '((:html-doctype "HTML_DOCTYPE" nil org-html-doctype)
+   ;;  (:html-container "HTML_CONTAINER" nil org-html-container-element)
+   ;;  (:html-content-class "HTML_CONTENT_CLASS" nil org-html-content-class)
+   ;;  (:description "DESCRIPTION" nil nil newline)
+   ;;  (:keywords "KEYWORDS" nil nil space)
+   ;;  (:html-html5-fancy nil "html5-fancy" org-html-html5-fancy)
+   ;;  (:html-link-use-abs-url nil "html-link-use-abs-url" org-html-link-use-abs-url)
+   ;;  (:html-link-home "HTML_LINK_HOME" nil org-html-link-home)
+   ;;  (:html-link-up "HTML_LINK_UP" nil org-html-link-up)
+   ;;  (:html-mathjax "HTML_MATHJAX" nil "" space)
+   ;;  (:html-equation-reference-format "HTML_EQUATION_REFERENCE_FORMAT" nil org-html-equation-reference-format t)
+   ;;  (:html-postamble nil "html-postamble" org-html-postamble)
+   ;;  (:html-preamble nil "html-preamble" org-html-preamble)
+   ;;  (:html-head "HTML_HEAD" nil org-html-head newline)
+   ;;  (:html-head-extra "HTML_HEAD_EXTRA" nil org-html-head-extra newline)
+   ;;  (:subtitle "SUBTITLE" nil nil parse)
+   ;;  (:html-head-include-default-style
+   ;;   nil "html-style" org-html-head-include-default-style)
+   ;;  (:html-head-include-scripts nil "html-scripts" org-html-head-include-scripts)
+   ;;  (:html-allow-name-attribute-in-anchors
+   ;;   nil nil org-html-allow-name-attribute-in-anchors)
+   ;;  (:html-divs nil nil org-html-divs)
+   ;;  (:html-checkbox-type nil nil org-html-checkbox-type)
+   ;;  (:html-extension nil nil org-html-extension)
+   ;;  (:html-footnote-format nil nil org-html-footnote-format)
+   ;;  (:html-footnote-separator nil nil org-html-footnote-separator)
+   ;;  (:html-footnotes-section nil nil org-html-footnotes-section)
+   ;;  (:html-format-drawer-function nil nil org-html-format-drawer-function)
+   ;;  (:html-format-headline-function nil nil org-html-format-headline-function)
+   ;;  (:html-format-inlinetask-function
+   ;;   nil nil org-html-format-inlinetask-function)
+   ;;  (:html-home/up-format nil nil org-html-home/up-format)
+   ;;  (:html-indent nil nil org-html-indent)
+   ;;  (:html-infojs-options nil nil org-html-infojs-options)
+   ;;  (:html-infojs-template nil nil org-html-infojs-template)
+   ;;  (:html-inline-image-rules nil nil org-html-inline-image-rules)
+   ;;  (:html-link-org-files-as-html nil nil org-html-link-org-files-as-html)
+   ;;  (:html-mathjax-options nil nil org-html-mathjax-options)
+   ;;  (:html-mathjax-template nil nil org-html-mathjax-template)
+   ;;  (:html-metadata-timestamp-format nil nil org-html-metadata-timestamp-format)
+   ;;  (:html-postamble-format nil nil org-html-postamble-format)
+   ;;  (:html-preamble-format nil nil org-html-preamble-format)
+   ;;  (:html-prefer-user-labels nil nil org-html-prefer-user-labels)
+   ;;  (:html-self-link-headlines nil nil org-html-self-link-headlines)
+   ;;  (:html-table-align-individual-fields
+   ;;   nil nil org-html-table-align-individual-fields)
+   ;;  (:html-table-caption-above nil nil org-html-table-caption-above)
+   ;;  (:html-table-data-tags nil nil org-html-table-data-tags)
+   ;;  (:html-table-header-tags nil nil org-html-table-header-tags)
+   ;;  (:html-table-use-header-tags-for-first-column
+   ;;   nil nil org-html-table-use-header-tags-for-first-column)
+   ;;  (:html-tag-class-prefix nil nil org-html-tag-class-prefix)
+   ;;  (:html-text-markup-alist nil nil org-html-text-markup-alist)
+   ;;  (:html-todo-kwd-class-prefix nil nil org-html-todo-kwd-class-prefix)
+   ;;  (:html-toplevel-hlevel nil nil org-html-toplevel-hlevel)
+   ;;  (:html-use-infojs nil nil org-html-use-infojs)
+   ;;  (:html-validation-link nil nil org-html-validation-link)
+   ;;  (:html-viewport nil nil org-html-viewport)
+   ;;  (:html-inline-images nil nil org-html-inline-images)
+   ;;  (:html-table-attributes nil nil org-html-table-default-attributes)
+   ;;  (:html-table-row-open-tag nil nil org-html-table-row-open-tag)
+   ;;  (:html-table-row-close-tag nil nil org-html-table-row-close-tag)
+   ;;  (:html-xml-declaration nil nil org-html-xml-declaration)
+   ;;  (:html-wrap-src-lines nil nil org-html-wrap-src-lines)
+   ;;  (:html-klipsify-src nil nil org-html-klipsify-src)
+   ;;  (:html-klipse-css nil nil org-html-klipse-css)
+   ;;  (:html-klipse-js nil nil org-html-klipse-js)
+   ;;  (:html-klipse-selection-script nil nil org-html-klipse-selection-script)
+   ;;  (:infojs-opt "INFOJS_OPT" nil nil)
+   ;;  ;; Redefine regular options.
+   ;;  (:creator "CREATOR" nil org-html-creator-string)
+   ;;  (:with-latex nil "tex" org-html-with-latex)
+   ;;  ;; Retrieve LaTeX header for fragments.
+   ;;  (:latex-header "LATEX_HEADER" nil nil newline))
+  )
 
 
 ;;; Internal Variables
