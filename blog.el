@@ -69,6 +69,8 @@
   (message (format "gn/blog-render %s not supported" element-type)))
 
 (defun gn/blog-render-bold (_bold contents _info)
+  (pp contents)
+  
   (format "[:b %S]" contents))
 
 (defun gn/blog-render-center-block (center-block contents info)
@@ -105,13 +107,37 @@
   (gn/blog-render-unsupported "footnote-reference"))
 
 (defun gn/blog-render-headline (headline contents info) 
-  (format "[:headline %S]" contents))
+  "A transcoder for headlines."
+  (pp contents)
+  (let* ((level (+ (org-export-get-relative-level headline info)
+                   (1- (plist-get info :html-toplevel-hlevel))))
+         (text (org-export-data (org-element-property :title headline) info))
+         (tags (and (plist-get info :with-tags)
+                    (org-export-get-tags headline info)))
+         (full-text (funcall (plist-get info :html-format-headline-function)
+                             text tags info))
+         (contents (or contents ""))
+	 (id (org-html--reference headline info))
+         (formatted-text (format "[:a {:id %S :href \"#%s\"} %S]" id id full-text)))
+    (if (< 6 level)
+        (throw 'gn/blog-render-headline "Cannot render headline level more than 6.")
+      (let ((first-content (car (org-element-contents headline))))
+        (format "[:div [:h%d {:id %S} %s] %s]"
+                level
+                id
+                (format "[:a {:href \"#%s\"} %S]" id full-text)
+                contents)))))
 
 (defun gn/blog-render-horizontal-rule (horizontal-rule contents info) 
-  (format "[:hr %S]" contents))
+  "[:hr]")
 
 (defun gn/blog-render-inline-src-block (inline-src-block contents info) 
-  (format "[:code %S]" contents))
+  "Transcoder for inline src block"
+  (let* ((lang (org-element-property :language inline-src-block))
+         (code (org-html-fontify-code
+                (org-element-property :value inline-src-block)
+                lang)))
+    (format "[:code.language-%s %S]" lang code)))
 
 (defun gn/blog-render-inlinetask (inlinetask contents info) 
   (gn/blog-render-unsupported "inlinetask"))
@@ -123,7 +149,26 @@
   (format "[:i %S]" contents))
 
 (defun gn/blog-render-item (item contents info) 
-  (format "[:li %S]" contents))
+  (let* ((plain-list (org-export-get-parent item))
+         (type (org-element-property :type plain-list))
+         (counter (org-element-property :counter item))
+         (checkbox (org-element-property :checkbox item))
+         (term (let ((tag (org-element-property :tag item)))
+                 (and tag (org-export-data tag info))))
+         (text (if (org-string-nw-p contents)
+                   (org-trim contents)
+                 "")))
+    (pcase type
+      (`ordered
+       (format "[:li %s %S]"
+               (if counter (format "{:value %S}" counter) "")
+               text))
+      (`unordered
+       (format "[:li %S]" text))
+      (`descriptive
+       (format "%s [:dd %S]"
+               (if term (format "[:dt %S]" term) "")
+               text)))))
 
 (defun gn/blog-render-keyword (keyword contents info) 
   (gn/blog-render-unsupported "keyword"))
@@ -151,7 +196,7 @@
 (defun gn/blog-render-plain-list (plain-list contents info) 
   (format "[:ul %S]" contents))
 
-(defun gn/blog-render-plain-text (plain-text contents info) 
+(defun gn/blog-render-plain-text (contents info) 
   contents)
 
 (defun gn/blog-render-planning (planning contents info) 
