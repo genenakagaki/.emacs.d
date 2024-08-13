@@ -1,0 +1,373 @@
+#+STARTUP: hideblocks
+#+STARTUP: nohideblocks
+#+STARTUP: align
+#+STARTUP: noalign
+#+STARTUP: shrink
+#+TODO: TODO(t) WAIT(w@/!) | DONE(d!) CANCELED(c@)
+#+FILETAGS: :Peter:Boss:Secret:
+#+TAGS: [ Control : Context Task ]
+#+TAGS: [ Persp : Vision Goal AOF Project ]
+
+* Headline samples
+
+** Headline sections
+*** no section
+*** section with empty lines
+
+*** section with some text
+some text
+*** section with some text with empty lines
+
+some text with empty lines above and below 
+
+** Headline hyperlinks
+*** [[https://orgmode.org/manual/index.html]] 
+*** [[https://orgmode.org/manual/index.html][link with description]] 
+*** [[https://orgmode.org/manual/index.html][link]] with text after
+*** text before [[https://orgmode.org/manual/index.html][link]] 
+
+** Headline with markup 
+*** *bold*
+*** /italic/
+*** _underlined_
+*** =verbatim=
+*** ~code~
+*** +strike-through+
+
+* Plain List samples
+Unordered lists
+- with nesting
+  - item without nested list
+  - item with nested list
+    - first item of nested list
+    - second item of nestetd list
+- with content on separate lines
+  - no nesting, no content
+  - no nesting, with some content
+    some content 
+  - no nesting, with some content with empty lines
+
+    some content with empty line above and below
+
+  - no nesting, with block
+    #+begin_example
+      example block
+    #+end_example
+- markup
+  - *bold*
+  - /italic/
+  - _underlined_
+  - =verbatim=
+  - ~code~
+  - +strike-through+
+- hyperlinks
+  - [[https://orgmode.org/manual/index.html]] 
+  - [[https://orgmode.org/manual/index.html][link with description]] 
+  - [[https://orgmode.org/manual/index.html][link]] with text after
+  - text before [[https://orgmode.org/manual/index.html][link]] 
+- alternative bullet type 1
+  + type 1 first item
+  + type 1 second item
+- alternative bullet type 2
+  * type 2 first item
+  * type 2 second item
+- ordered
+  1. first item
+  2. second item
+- description
+  - first term :: first description
+  - second term :: second description
+    
+Ordered lists
+1. with nesting
+   1. item without nested list
+   2. item with nested list
+      1. first item of nested list
+      2. second item of nestetd list
+2. with content on separate lines
+   1. no nesting, no content
+   2. no nesting, with some content
+      some content 
+   3. no nesting, with some content with empty lines
+
+      some content with empty line above and below
+
+   4. no nesting, with block
+      #+begin_example
+        example block
+      #+end_example
+3. markup
+   - *bold*
+   - /italic/
+   - _underlined_
+   - =verbatim=
+   - ~code~
+   - +strike-through+
+4. hyperlinks
+   - [[https://orgmode.org/manual/index.html]] 
+   - [[https://orgmode.org/manual/index.html][link with description]] 
+   - [[https://orgmode.org/manual/index.html][link]] with text after
+   - text before [[https://orgmode.org/manual/index.html][link]] 
+5. alternative bullet type 1
+   1) type 1 first item
+   2) type 1 second item
+6. unordered
+   - first item
+   - second item
+7. description
+   - first term :: first description
+   - second term :: second description
+
+Description lists
+- term :: with nesting
+  - term :: item without nested list
+  - term :: item with nested list
+    - term :: first item of nested list
+    - term :: second item of nestetd list
+- term :: with content on separate lines
+  - term :: no nesting, no content
+  - term :: no nesting, with some content
+    some content 
+  - term :: no nesting, with some content with empty lines
+
+    some content with empty line above and below
+
+  - term :: no nesting, with block
+    #+begin_example
+      example block
+    #+end_example
+- term :: markup
+  - *bold* :: *bold*
+  - /italic/ :: /italic/
+  - _underlined_ :: _underlined_
+  - =verbatim= :: =verbatim=
+  - ~code~ :: ~code~
+  - +strike-through+ :: +strike-through+
+- term :: hyperlinks
+  - term :: [[https://orgmode.org/manual/index.html]] 
+  - term :: [[https://orgmode.org/manual/index.html][link with description]] 
+  - term :: [[https://orgmode.org/manual/index.html][link]] with text after
+  - term :: text before [[https://orgmode.org/manual/index.html][link]]
+  - [[https://orgmode.org/manual/index.html]] :: term with link
+  - [[https://orgmode.org/manual/index.html][link with description]] :: term with link with description
+  - [[https://orgmode.org/manual/index.html][link]] with text after :: term with link and text
+  - text before [[https://orgmode.org/manual/index.html][link]] :: term with link and text
+- alternative bullet type 1
+  + term :: type 1 first item
+  + term :: type 1 second item
+- alternative bullet type 2
+  * term :: type 2 first item
+  * term :: type 2 second item
+- unordered
+  - first item
+  - second item
+- ordered
+  1. first item
+  2. second item
+
+* Drawers
+Still outside the drawer
+:DRAWERNAME:
+This is inside the drawer.
+:END:
+After the drawert.
+
+* Tables
+| Name  | Phone | Age |
+|-------+-------+-----|
+| Peter | 1234  |  17 |
+| Anna  | 4321  |  25 |
+
+|---+---------------------+--------|
+|   | <6>                 |    <r> |
+| 1 | one                 |   some |
+| 2 | two                 | boring |
+| 3 | This is a long text | column |
+|---+---------------------+--------|
+
+* Hyperlinks
+[[https://orgmode.org/manual/Link-Format.html][Hyperlink]]
+
+[[https://orgmode.org/manual/Link-Format.html]]
+
+[[* Hyperlinks]]
+
+ 
+* "TODO" Items
+
+** TODO Shave
+SCHEDULED: <2009-10-17 Sat .+2d/4d>
+:PROPERTIES:
+:STYLE:    habit
+:LAST_REPEAT: [2009-10-19 Mon 00:36]
+:END:
+- State "DONE"       from "TODO"       [2009-10-15 Thu]
+- State "DONE"       from "TODO"       [2009-10-12 Mon]
+- State "DONE"       from "TODO"       [2009-10-10 Sat]
+- State "DONE"       from "TODO"       [2009-10-04 Sun]
+- State "DONE"       from "TODO"       [2009-10-02 Fri]
+- State "DONE"       from "TODO"       [2009-09-29 Tue]
+- State "DONE"       from "TODO"       [2009-09-25 Fri]
+- State "DONE"       from "TODO"       [2009-09-19 Sat]
+- State "DONE"       from "TODO"       [2009-09-16 Wed]
+- State "DONE"       from "TODO"       [2009-09-12 Sat]
+
+** Parent capturing statistics [2/5]
+:PROPERTIES:
+:COOKIE_DATA: todo recursive
+:END:
+
+*** Organize Party [40%]
+**** TODO Call people [1/2]
+***** TODO Peter
+***** DONE Sarah
+**** TODO Buy food
+**** DONE Talk to neighbor
+
+** TODO Organize party [2/4]
+- [-] call people [1/3]
+  - [ ] Peter
+  - [X] Sarah
+  - [ ] Sam
+- [X] order food
+- [ ] think about what music to play
+- [X] talk to the neighbors
+
+* Tags
+** Meeting with the French group                                      :work:
+*** Summary by Frank                                           :boss:notes:
+**** TODO Prepare slides for him                                  :action:
+
+* Property and Columns 
+** CD collection
+*** Classic
+**** Goldberg Variations
+:PROPERTIES:
+:Title:    Goldberg Variations
+:Composer: J.S. Bach
+:Artist:   Glenn Gould
+:Publisher: Deutsche Grammophon
+:NDisks:   1
+:END:
+
+* Dates and Times
+** Meet Peter at the movies
+<2006-11-01 Wed 19:15>
+** Discussion on climate change
+<2006-11-02 Thu 20:00-22:00>
+** Pick up Sam at school
+<2007-05-16 Wed 12:30 +1w>
+** Meeting in Amsterdam
+<2004-08-23 Mon>--<2004-08-26 Thu>
+** Gillian comes late for the fifth time
+[2006-11-01 Wed]
+** TODO write article about the Earth for the Guide
+DEADLINE: <2004-02-29 Sun>
+The editor in charge is [[bbdb:Ford Prefect]]
+
+** TODO Call Trillian for a date on New Years Eve.
+SCHEDULED: <2004-12-25 Sat>
+** TODO Pay the rent
+DEADLINE: <2005-10-01 Sat +1m>
+** TODO Call Father
+DEADLINE: <2008-02-10 Sun ++1w>
+Marking this DONE shifts the date by at least one week, but also
+by as many weeks as it takes to get this date into the future.
+However, it stays on a Sunday, even if you called and marked it
+done on Saturday.
+
+** TODO Empty kitchen trash
+DEADLINE: <2008-02-08 Fri 20:00 ++1d>
+Marking this DONE shifts the date by at least one day, and also
+by as many days as it takes to get the timestamp into the future.
+Since there is a time in the timestamp, the next deadline in the
+future will be on today's date if you complete the task before
+20:00.
+
+** TODO Check the batteries in the smoke detectors
+DEADLINE: <2005-11-01 Tue .+1m>
+Marking this DONE shifts the date to one month after today.
+
+** TODO Wash my hands
+DEADLINE: <2019-04-05 08:00 Fri .+1h>
+Marking this DONE shifts the date to exactly one hour from now.
+
+* Markup for Rich Contents
+
+#+BEGIN_VERSE
+ Great clouds overhead
+ Tiny black birds rise and fall
+ Snow covers Emacs
+
+    ---AlexSchroeder
+#+END_VERSE
+
+#+BEGIN_QUOTE
+Everything should be made as simple as possible,
+but not any simpler ---Albert Einstein
+#+END_QUOTE
+
+#+BEGIN_CENTER
+Everything should be made as simple as possible, \\
+but not any simpler
+#+END_CENTER
+
+- *bold*
+- /italic/
+- _underlined_
+- =verbatim=
+- ~code~
+- +strike-through+
+
+/One may expect this whole sentence to be italicized, but the
+following ~user/?variable~ contains =/= character, which effectively
+stops emphasis there./
+
+The radius of the sun is R_sun = 6.96 x 10^8 m.  On the other hand,
+the radius of Alpha Centauri is R_{Alpha Centauri} = 1.28 x R_{sun}.
+
+Pro tip: Given a circle \Gamma of diameter d, the length of its
+circumference is \pi{}d.
+
+#+BEGIN_EXAMPLE
+  Some example from a text file.
+#+END_EXAMPLE
+
+#+BEGIN_EXAMPLE
+,* I am no real headline
+#+END_EXAMPLE
+
+Here is an example
+   : Some example from a text file.
+
+#+BEGIN_SRC emacs-lisp
+  (defun org-xor (a b)
+    "Exclusive or."
+    (if a (not b) b))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp -n 20
+  ;; This exports with line number 20.
+  (message "This is line 21")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp +n 10
+  ;; This is listed as line 31.
+  (message "This is line 32")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp -n -r
+  (save-excursion                 (ref:sc)
+     (goto-char (point-min))      (ref:jump)
+#+END_SRC
+In line [[(sc)]] we remember the current position. [[(jump)][Line (jump)]]
+jumps to point-min.
+
+#+CAPTION[short caption]: This is the caption for the next figure link (or table)
+#+NAME:   fig:SED-HR4049
+[[./images/sample.jpeg]]
+
+-----
+
+
+
