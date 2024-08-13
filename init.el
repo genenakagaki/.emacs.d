@@ -141,7 +141,8 @@
    evil-undo-system 'undo-redo
    )
   :config
-  (evil-mode 1))
+  (evil-mode 1)
+  (evil-select-search-module 'evil-search-module 'evil-search))
 
 (use-package goto-chg)
 
