@@ -289,9 +289,9 @@
 (defun gn/blog-render-src-block (src-block contents info) 
   "render src block"
   (let* ((lang (org-element-property :language src-block))
-         (code (org-html-format-code src-block info)))
+         (code (car (org-export-unravel-code src-block))))
     (if (not lang) (format "[:pre %s]" code)
-      (format "[:pre [:code {:class \"language-%s\"} %s]]"
+      (format "[:pre [:code {:class \"language-%s\"} %S]]"
               lang code))))
 
 (defun gn/blog-render-statistics-cookie (statistics-cookie contents info) 
