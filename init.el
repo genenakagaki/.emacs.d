@@ -139,6 +139,8 @@
    evil-want-keybinding nil
    ;; Setup undo system 
    evil-undo-system 'undo-redo
+   ;; fine grain undo
+   evil-want-fine-undo t
    )
   :config
   (evil-mode 1)
@@ -354,6 +356,8 @@
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
   ;; (global-tempel-abbrev-mode)
   )
+
+(use-package helpful)
 
 (defvar gn/preview-file (expand-file-name "emacs-preview/src/emacs/preview/data.cljs"
                                           user-emacs-directory))
@@ -720,6 +724,12 @@ Running gn/org-dwim-at-point function...")
 
 (general-def '(n i v) 'override
   "M-z" 'evil-force-normal-state)
+
+(general-def '(n i v) 'override
+  "C-h f" 'helpful-callable
+  "C-h v" 'helpful-variable
+  "C-h k" 'helpful-key
+  "C-h x" 'helpful-command)
 
 (defvar gn/leader-key "SPC")
 

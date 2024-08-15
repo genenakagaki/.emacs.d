@@ -206,6 +206,8 @@ Vim emulation
      evil-want-keybinding nil
      ;; Setup undo system 
      evil-undo-system 'undo-redo
+     ;; fine grain undo
+     evil-want-fine-undo t
      )
     :config
     (evil-mode 1)
@@ -472,6 +474,14 @@ Tempel
 #+end_src
 
 * Modes
+** Help
+
+Better display for help menu.
+https://github.com/Wilfred/helpful?tab=readme-ov-file
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package helpful)
+#+end_src
+
 ** Emacs preview
 #+begin_src emacs-lisp :tangle yes
   (defvar gn/preview-file (expand-file-name "emacs-preview/src/emacs/preview/data.cljs"
@@ -915,6 +925,15 @@ Remove unwanted defaults
 #+begin_src emacs-lisp :tangle yes :results none
   (general-def '(n i v) 'override
     "M-z" 'evil-force-normal-state)
+#+end_src
+
+Help command override
+#+begin_src emacs-lisp :tangle yes :results none
+  (general-def '(n i v) 'override
+    "C-h f" 'helpful-callable
+    "C-h v" 'helpful-variable
+    "C-h k" 'helpful-key
+    "C-h x" 'helpful-command)
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
