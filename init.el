@@ -521,7 +521,8 @@ Running gn/org-dwim-at-point function...")
 
   (org-babel-do-load-languages
    'org-babel-load-languages
-   '((shell . t)))
+   '((shell . t)
+     (js . t)))
 
   ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook
