@@ -8,6 +8,8 @@
 #+TAGS: [ Control : Context Task ]
 #+TAGS: [ Persp : Vision Goal AOF Project ]
 
+testing
+
 * Headline samples
 
 ** Headline sections
@@ -164,6 +166,7 @@ Description lists
 - ordered
   1. first item
   2. second item
+
 
 * Drawers
 Still outside the drawer
@@ -364,6 +367,10 @@ In line [[(sc)]] we remember the current position. [[(jump)][Line (jump)]]
 jumps to point-min.
 
 #+CAPTION[short caption]: This is the caption for the next figure link (or table)
+#+NAME:   fig:SED-HR4049
+[[./images/sample.jpeg]]
+
+
 #+NAME:   fig:SED-HR4049
 [[./images/sample.jpeg]]
 
