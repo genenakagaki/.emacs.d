@@ -370,7 +370,7 @@ information."
 
 
 (defun gn/blog-render-verse-block (verse-block contents info) 
-  (gn/blog-render-unsupported "verse-block"))
+  (format "{:type :quote-block :contents [%s]}" contents))
 
 (defun gn/blog-export-as-blog
     (&optional async subtreep visible-only body-only ext-plist)
