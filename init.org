@@ -281,6 +281,16 @@ Hydra
     (doom-themes-org-config))
 #+end_src
 
+Font
+日本語のプログラミングフォントを使う
+1. Download the font here
+   https://github.com/yuru7/udev-gothic
+2. [[id:5DACFE1E-4969-4F9A-B006-120C87091534][Install a new font]] 
+3. Set the new font below 
+#+begin_src emacs-lisp :tangle yes :results none
+  ;(add-to-list 'default-frame-alist '(font . "UDEV Gothic-14"))
+#+end_src
+
 ** File
 #+begin_src emacs-lisp :tangle yes
   (defun gn/open-config-file ()
@@ -675,7 +685,8 @@ My functions
     (org-babel-do-load-languages
      'org-babel-load-languages
      '((shell . t)
-       (js . t)))
+       (js . t)
+       (sql . t)))
 
     ;; Disable flycheck for emacs literate configuration
     (general-add-hook 'org-src-mode-hook
@@ -899,6 +910,29 @@ Org todo settings
   (use-package verb
     :mode ("\\.org\\'" . org-mode)
     )
+#+END_src
+
+
+** Database SQL Client
+#+begin_src emacs-lisp :tangle yes
+  (use-package auto-complete)
+
+  (use-package ejc-sql
+    :config
+    (require 'ejc-autocomplete)
+    (add-hook 'ejc-sql-minor-mode-hook
+              (lambda ()
+                (auto-complete-mode t)
+                (ejc-ac-setup)))
+    (add-hook 'ejc-sql-connected-hook
+              (lambda ()
+                (ejc-set-fetch-size 50)
+                (ejc-set-max-rows 50)
+                (ejc-set-show-too-many-rows-message t)
+                (ejc-set-column-width-limit 25)))
+    (setq ejc-result-table-impl 'orgtbl-mode)
+    )
+
 #+END_src
 
 

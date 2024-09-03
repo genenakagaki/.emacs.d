@@ -201,6 +201,8 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
+;(add-to-list 'default-frame-alist '(font . "UDEV Gothic-14"))
+
 (defun gn/open-config-file ()
   (interactive)
   (find-file (expand-file-name "init.org" user-emacs-directory)))
@@ -522,7 +524,8 @@ Running gn/org-dwim-at-point function...")
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)
-     (js . t)))
+     (js . t)
+     (sql . t)))
 
   ;; Disable flycheck for emacs literate configuration
   (general-add-hook 'org-src-mode-hook
@@ -712,6 +715,24 @@ Running gn/org-dwim-at-point function...")
 
 (use-package verb
   :mode ("\\.org\\'" . org-mode)
+  )
+
+(use-package auto-complete)
+
+(use-package ejc-sql
+  :config
+  (require 'ejc-autocomplete)
+  (add-hook 'ejc-sql-minor-mode-hook
+            (lambda ()
+              (auto-complete-mode t)
+              (ejc-ac-setup)))
+  (add-hook 'ejc-sql-connected-hook
+            (lambda ()
+              (ejc-set-fetch-size 50)
+              (ejc-set-max-rows 50)
+              (ejc-set-show-too-many-rows-message t)
+              (ejc-set-column-width-limit 25)))
+  (setq ejc-result-table-impl 'orgtbl-mode)
   )
 
 (use-package yaml-mode
