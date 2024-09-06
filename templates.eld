@@ -167,17 +167,19 @@ legend top
     <back:business>会員アクション</back> 
     <back:palegreen>まだ考慮する必要あり</back> 
 endlegend
+
 @enduml")
 (deployment "@startuml 
-skinparam ActivityBackgroundColor business
-skinparam ActivityDiamondBackgroundColor business
-skinparam ConditionEndStyle hline
+@enduml")
+(sequence "@startuml 
+actor User
+participant System
+dasabase Database
 
-legend top
-    <back:application>システムの処理</back> 
-    <back:business>会員アクション</back> 
-    <back:palegreen>まだ考慮する必要あり</back> 
-endlegend
+User --> System++: Api Request
+System --> Database++: save
+return void
+User <-- System--: Response
 @enduml")
 (if "if (" (s condition) ") then (no" (s left) ")" n
     "else (yes" (s right) ")" n
