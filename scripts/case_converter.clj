@@ -19,8 +19,6 @@
        ;; "thisIsATest"
        ]
       *command-line-args*
-
-      
       ]
   (let [words (cond
                 (kebab? text) (str/split text #"-")
@@ -28,12 +26,14 @@
                                     (map str/lower-case))
                 (camel? text) (cons (re-find #"^[a-z]*" text)
                                     (->> (re-seq #"[A-Z][a-z]*" text)
-                                         (map str/lower-case))))]
-    (-> (case case-type
-          "snake" (->> words
-                       (str/join "-"))
-          "camel" words
-          "pascal" words)
-        println))
+                                         (map str/lower-case))))
+        result (-> (case case-type
+                     "snake" (->> words
+                                  (str/join "-"))
+                     "camel" words
+                     "pascal" words))]
+    (println result)
+    (shell/sh "pbcopy" :in result)
+    )
   )
 
