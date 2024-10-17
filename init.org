@@ -323,6 +323,11 @@ Font
     (setq-local search-invisible nil))
 #+end_src
 
+Ripgrep
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package rg)
+#+end_src
+
 ** Inspections
 #+begin_src emacs-lisp :tangle yes
   ;;; Setup text insepctions
@@ -954,6 +959,37 @@ Org todo settings
   (setq dired-dwim-target t)
 #+end_src
 
+** Workspace
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package projectile
+    :config
+    (projectile-mode +1)
+
+    ;; temporary fix for projectile-ripgrep
+    ;; https://github.com/bbatsov/projectile/pull/1904
+    (setq projectile-globally-ignored-directories
+          '("^\\.idea$"
+            "^\\.vscode$"
+            "^\\.ensime_cache$"
+            "^\\.eunit$"
+            "^\\.git$"
+            "^\\.hg$"
+            "^\\.fslckout$"
+            "^_FOSSIL_$"
+            "^\\.bzr$"
+            "^_darcs$"
+            "^\\.pijul$"
+            "^\\.tox$"
+            "^\\.svn$"
+            "^\\.stack-work$"
+            "^\\.ccls-cache$"
+            "^\\.cache$"
+            "^\\.clangd$"
+            ;; "*CVS" this was the cause so I commented it out
+            "^\\.sl$"
+            "^\\.jj$")))
+#+end_src
+
 * Keybindings
 ** Global 
 Remove unwanted defaults
@@ -1196,6 +1232,13 @@ hydra-headline
     "M-RET" 'gn/plantuml-preview)
 #+end_src
 
+*** Projectile
+#+begin_src emacs-lisp :tangle yes :results none
+  (general-def 'n 'projectile-mode-map
+    :prefix gn/leader-key
+
+    "p" '(projectile-command-map :wk "Projectile"))
+#+end_src
 * Configuration for Literate Emacs Config
         
 # Local Variables:

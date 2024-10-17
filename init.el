@@ -226,6 +226,8 @@
 (defun gn/search-only-visible-text ()
   (setq-local search-invisible nil))
 
+(use-package rg)
+
 ;;; Setup text insepctions
 (use-package flycheck
   :config
@@ -744,6 +746,34 @@ Running gn/org-dwim-at-point function...")
 
 (setq dired-dwim-target t)
 
+(use-package projectile
+  :config
+  (projectile-mode +1)
+
+  ;; temporary fix for projectile-ripgrep
+  ;; https://github.com/bbatsov/projectile/pull/1904
+  (setq projectile-globally-ignored-directories
+        '("^\\.idea$"
+          "^\\.vscode$"
+          "^\\.ensime_cache$"
+          "^\\.eunit$"
+          "^\\.git$"
+          "^\\.hg$"
+          "^\\.fslckout$"
+          "^_FOSSIL_$"
+          "^\\.bzr$"
+          "^_darcs$"
+          "^\\.pijul$"
+          "^\\.tox$"
+          "^\\.svn$"
+          "^\\.stack-work$"
+          "^\\.ccls-cache$"
+          "^\\.cache$"
+          "^\\.clangd$"
+          ;; "*CVS" this was the cause so I commented it out
+          "^\\.sl$"
+          "^\\.jj$")))
+
 (general-def '(n i v) 'override
   "M-z" 'evil-force-normal-state)
 
@@ -929,3 +959,8 @@ Running gn/org-dwim-at-point function...")
 
 (general-def '(n i) plantuml-mode-map
   "M-RET" 'gn/plantuml-preview)
+
+(general-def 'n 'projectile-mode-map
+  :prefix gn/leader-key
+
+  "p" '(projectile-command-map :wk "Projectile"))
