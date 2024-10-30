@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+bb ~/.emacs.d/scripts/case_converter.clj snake "${1:-/dev/stdin}"
