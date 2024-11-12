@@ -759,7 +759,8 @@ Vim keybinding
     (setq org-roam-dailies-directory "journal")
     :config
     (org-roam-db-autosync-mode)
-    (setq org-roam-node-display-template "${gn-node-display}")
+    (setq org-roam-node-display-template (concat (propertize "${tags} " 'face 'org-tag)
+                                                 "${title}"))
 
     (setq org-roam-capture-templates
           '(("d" "default"
@@ -868,6 +869,10 @@ Org todo settings
 
 
 
+*** Export
+#+begin_src emacs-lisp :tangle yes :results none
+  (setq org-export-headline-levels 6)
+#+end_src
 ** PlantUML
 #+begin_src emacs-lisp :tangle yes
   (use-package request)

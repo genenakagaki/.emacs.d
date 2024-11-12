@@ -575,7 +575,8 @@ Running gn/org-dwim-at-point function...")
   (setq org-roam-dailies-directory "journal")
   :config
   (org-roam-db-autosync-mode)
-  (setq org-roam-node-display-template "${gn-node-display}")
+  (setq org-roam-node-display-template (concat (propertize "${tags} " 'face 'org-tag)
+                                               "${title}"))
 
   (setq org-roam-capture-templates
         '(("d" "default"
@@ -675,6 +676,8 @@ Running gn/org-dwim-at-point function...")
   "Opens the task inbox file. This is where you put all the tasks."
   (interactive)
   (find-file (concat org-roam-directory "/todo.org")))
+
+(setq org-export-headline-levels 6)
 
 (use-package request)
 
