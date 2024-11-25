@@ -361,7 +361,44 @@
   ;; (global-tempel-abbrev-mode)
   )
 
+(setq ispell-program-name "aspell")
+
 (use-package helpful)
+
+(require 'tramp)
+
+;; ("docker"
+;;   (tramp-login-program "docker")
+;;   (tramp-login-args
+;;    (("exec")
+;;     ("-it")
+;;     ("-u" "%u")
+;;     ("%h")
+;;     ("%l")))
+;;   (tramp-direct-async
+;;    ("/bin/sh" "-c"))
+;;   (tramp-remote-shell "/bin/sh")
+;;   (tramp-remote-shell-login
+;;    ("-l"))
+;;   (tramp-remote-shell-args
+;;    ("-i" "-c")))
+
+;; (("/bash\\'" . "-noediting -norc -noprofile")
+;;  ("/zsh\\'" . "-f +Z -V"))
+
+; (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
+
+;; (setq tramp-default-remote-shell "/bin/bash"
+
+;;       tramp-connection-local-default-shell-variables
+;;       '((shell-file-name . "/bin/bash")
+;;         (shell-command-switch . "-c"))
+
+;;       docker-container-shell-file-name "/bin/bash"
+
+;;       explicit-shell-file-name "/bin/bash"
+;;       )
 
 (defvar gn/preview-file (expand-file-name "emacs-preview/src/emacs/preview/data.cljs"
                                           user-emacs-directory))
@@ -516,6 +553,7 @@ Running gn/org-dwim-at-point function...")
    org-clock-out-remove-zero-time-clocks t
 
 
+
    ;; https://github.com/abo-abo/swiper/issues/986
    ;; Use the search interface instead of the default
    org-goto-interface 'outline-path-completion
@@ -533,6 +571,7 @@ Running gn/org-dwim-at-point function...")
   (general-add-hook 'org-src-mode-hook
                     '(gn/disable-emacs-lisp-flycheck))
 
+  (add-hook 'org-mode-hook 'flyspell-mode)
 
   (require 'org-clock)
 
@@ -579,11 +618,23 @@ Running gn/org-dwim-at-point function...")
                                                "${title}"))
 
   (setq org-roam-capture-templates
-        '(("d" "default"
+        '(("e" "evergreen note"
            plain "%?"
            :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
                               "
 #+language: en
+#+filetags: :evergreen:
+#+title: ${title}
+
+* Description")
+           :immediate-finish
+           :jump-to-captured)
+          ("r" "reference note"
+           plain "%?"
+           :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+                              "
+#+language: en
+#+filetags: :reference:
 #+title: ${title}
 
 * Description")
@@ -777,6 +828,11 @@ Running gn/org-dwim-at-point function...")
           "^\\.sl$"
           "^\\.jj$")))
 
+(use-package eglot
+  :config
+  (add-to-list 'eglot-server-programs
+               `(csharp-mode . ("Omnisharp" "-lsp"))))
+
 (general-def '(n i v) 'override
   "M-z" 'evil-force-normal-state)
 
@@ -874,12 +930,19 @@ Running gn/org-dwim-at-point function...")
 ;;   "RET" #'tempel-next
 ;;   "S-RET" #'tempel-previous)
 
+(general-def 'n eglot-mode-map
+  "C-<return>" #'eglot-code-actions
+  "<f6>" #'eglot-rename
+  "=" #'eglot-format-buffer)
+
 (general-def 'i paredit-mode-map
   ;; Add matching closing parenthesis.
   "(" 'paredit-open-round
   "[" 'paredit-open-square
   "{" 'paredit-open-curly
-  "<" 'paredit-open-angled)
+  ;; angled brackets turned off due to messed up formatting
+  ;; "<" 'paredit-open-angled
+  )
 (general-def 'n paredit-mode-map
   :prefix gn/leader-key
   "dw" #'paredit-splice-sexp

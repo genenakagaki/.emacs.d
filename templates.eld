@@ -11,6 +11,87 @@ prog-mode
 (bug (if (derived-mode-p 'emacs-lisp-mode) ";; " comment-start) "BUG ")
 (hack (if (derived-mode-p 'emacs-lisp-mode) ";; " comment-start) "HACK ")
 
+csharp-mode
+(command "using ErrorOr;" n
+         "using MediatR;" n
+         "namespace CodeNet.Application." n
+         "pwd"
+         ";" n
+         "public class " (s command) "CommandHandler(IOrganizationRepository _orgRepo)" n
+         "  : IRequestHandler<" command "Command, ErrorOr<" (s returntype) ">>" n
+         "{" n
+         "    public async Task<ErrorOr<" returntype ">> Handle(" command "Command cmd, CancellationToken cancellationToken)" n
+         "    {" n
+         "        throw new NotImplementedException();" n
+         "    }" n
+         "}" n
+         n
+         "public record " command "Command(" n
+         "    string arg1"
+         ") : IRequest<ErrorOr<" returntype ">>;" n
+         :post (eglot-format-buffer))
+
+(query "using ErrorOr;" n
+       "using MediatR;" n
+       "namespace CodeNet.Application." n
+       "pwd"
+       ";" n
+       "public class " (s query) "QueryHandler(IOrganizationRepository _orgRepo)" n
+       "  : IRequestHandler<" query "Query, ErrorOr<" (s returntype) ">>" n
+       "{" n
+       "    public async Task<ErrorOr<" returntype ">> Handle(" query "Query cmd, CancellationToken cancellationToken)" n
+       "    {" n
+       "        throw new NotImplementedException();" n
+       "    }" n
+       "}" n
+       n
+       "public record " query "Query(" n
+       "    string arg1"
+       ") : IRequest<ErrorOr<" returntype ">>;" n
+       :post (eglot-format-buffer))
+
+(event "using MediatR;" n
+       "namespace CodeNet.Application." n
+       "pwd    " n
+       ";" n
+       "public class " (s event) "EventHandler()" n
+       "  : INotificationHandler<" event "Event>" n
+       "{" n
+       "    public Task Handle(" event "Event notification, CancellationToken cancellationToken)" n
+       "    {" n
+       "        throw new NotImplementedException();" n
+       "    }" n
+       "}" n
+       n
+       "public record " event "Event(" n
+       "    Guid eventArgs) : IDomainEvent;" n
+       :post (eglot-format-buffer))
+
+(configuration  "using Microsoft.EntityFrameworkCore;" n
+                "using Microsoft.EntityFrameworkCore.Metadata.Builders;" n
+                "namespace CodeNet.Infrastructure." n
+                "pwd" n
+                ";" n
+                "public class " (s aggregate) "ConfigurationModel : IEntityTypeConfiguration<" aggregate ">" n
+                "{" n
+                "    public void Configure(EntityTypeBuilder<" aggregate "> builder)" n
+                "    {" n
+                "    }" n
+                "}" n
+                :post (eglot-format-buffer))
+
+(repository "using CodeNet.Infrastructure.Common.Persistance;" n
+            "" n
+            "namespace CodeNet.Infrastructure" n
+            "pwd" n
+            ";" n
+            "" n
+            "public class " (s name) "Repository(CodeNetDbContext _dbContext)" n
+            "  : I" name "Repository" n
+            "{" n
+            "}"
+            :post (eglot-format-buffer))
+
 latex-mode
 
 (abstract "\\begin{abstract}\n" r> n> "\\end{abstract}")

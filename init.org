@@ -2,6 +2,16 @@
 #+property: header-args: emacs-lisp :tangle ./init.el :mkdirp yes
 #+startup: show5levels
 
+* Introduction
+
+* External Dependencies
+These are the external tools that this Emacs configuration uses. These tools need to be installed for this Emacs
+These are the external tools I use on Emacs. These needs to be installed for my configuration to work.
+
+- Auto git commit :: https://github.com/gitwatch/gitwatch
+- Dockerfile Linting :: https://github.com/hadolint/hadolint
+- Spell checking :: http://aspell.net/
+
 * Initialization
 This configuration needs to be evaluated first before configuring other stuff.
 
@@ -488,6 +498,12 @@ Tempel
 
 #+end_src
 
+** Spell Checking
+Be sure to have a spell checking tool installed. This configuration assumes that [[http://aspell.net/][Aspell]] is installed.
+#+begin_src emacs-lisp :tangle yes :results none
+  (setq ispell-program-name "aspell")
+#+end_src
+
 * Modes
 ** Help
 
@@ -496,7 +512,56 @@ https://github.com/Wilfred/helpful?tab=readme-ov-file
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package helpful)
 #+end_src
+** TRAMP
+Load tramp before doing any tramp configurations.
+#+begin_src emacs-lisp :tangle yes :results none
+  (require 'tramp)
+#+end_src
 
+Use bash for starting shell on tramp.
+https://www.gnu.org/software/tramp/#Predefined-connection-information
+
+In order to do this, overwrite the =tramp-methods= variable through the =tramp-connection-properties=.
+#+begin_src emacs-lisp :tangle yes :results none
+
+  ;; ("docker"
+  ;;   (tramp-login-program "docker")
+  ;;   (tramp-login-args
+  ;;    (("exec")
+  ;;     ("-it")
+  ;;     ("-u" "%u")
+  ;;     ("%h")
+  ;;     ("%l")))
+  ;;   (tramp-direct-async
+  ;;    ("/bin/sh" "-c"))
+  ;;   (tramp-remote-shell "/bin/sh")
+  ;;   (tramp-remote-shell-login
+  ;;    ("-l"))
+  ;;   (tramp-remote-shell-args
+  ;;    ("-i" "-c")))
+
+  ;; (("/bash\\'" . "-noediting -norc -noprofile")
+  ;;  ("/zsh\\'" . "-f +Z -V"))
+#+end_src
+
+Add the remote path to the path. This changes the $PATH variable.  
+
+https://www.gnu.org/software/tramp/#Remote-shell-setup
+#+begin_src emacs-lisp :tangle yes :results none
+  ; (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
+
+  ;; (setq tramp-default-remote-shell "/bin/bash"
+
+  ;;       tramp-connection-local-default-shell-variables
+  ;;       '((shell-file-name . "/bin/bash")
+  ;;         (shell-command-switch . "-c"))
+
+  ;;       docker-container-shell-file-name "/bin/bash"
+
+  ;;       explicit-shell-file-name "/bin/bash"
+  ;;       )
+#+end_src
 ** Emacs preview
 #+begin_src emacs-lisp :tangle yes
   (defvar gn/preview-file (expand-file-name "emacs-preview/src/emacs/preview/data.cljs"
@@ -680,6 +745,7 @@ My functions
      org-clock-out-remove-zero-time-clocks t
 
 
+
      ;; https://github.com/abo-abo/swiper/issues/986
      ;; Use the search interface instead of the default
      org-goto-interface 'outline-path-completion
@@ -697,6 +763,7 @@ My functions
     (general-add-hook 'org-src-mode-hook
                       '(gn/disable-emacs-lisp-flycheck))
 
+    (add-hook 'org-mode-hook 'flyspell-mode)
 
     (require 'org-clock)
 
@@ -763,11 +830,23 @@ Vim keybinding
                                                  "${title}"))
 
     (setq org-roam-capture-templates
-          '(("d" "default"
+          '(("e" "evergreen note"
              plain "%?"
              :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
                                 "
   ,#+language: en
+  ,#+filetags: :evergreen:
+  ,#+title: ${title}
+
+  ,* Description")
+             :immediate-finish
+             :jump-to-captured)
+            ("r" "reference note"
+             plain "%?"
+             :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+                                "
+  ,#+language: en
+  ,#+filetags: :reference:
   ,#+title: ${title}
 
   ,* Description")
@@ -995,6 +1074,14 @@ Org todo settings
             "^\\.jj$")))
 #+end_src
 
+** LSP (Eglot)
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package eglot
+    :config
+    (add-to-list 'eglot-server-programs
+                 `(csharp-mode . ("Omnisharp" "-lsp"))))
+#+end_src
+
 * Keybindings
 ** Global 
 Remove unwanted defaults
@@ -1117,6 +1204,13 @@ TempEL
 #+end_src
 
 *** Programming Language
+#+begin_src emacs-lisp :tangle yes :results none
+  (general-def 'n eglot-mode-map
+    "C-<return>" #'eglot-code-actions
+    "<f6>" #'eglot-rename
+    "=" #'eglot-format-buffer)
+#+end_src
+
 **** Lisp
 #+begin_src emacs-lisp :tangle yes
   (general-def 'i paredit-mode-map
@@ -1124,7 +1218,9 @@ TempEL
     "(" 'paredit-open-round
     "[" 'paredit-open-square
     "{" 'paredit-open-curly
-    "<" 'paredit-open-angled)
+    ;; angled brackets turned off due to messed up formatting
+    ;; "<" 'paredit-open-angled
+    )
   (general-def 'n paredit-mode-map
     :prefix gn/leader-key
     "dw" #'paredit-splice-sexp

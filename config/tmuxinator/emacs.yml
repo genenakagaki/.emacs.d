@@ -54,4 +54,4 @@ windows:
         - emacs
         - gitwatch -r origin ~/org-roam
         - docker compose up
-        - cd ./emacs-preview; pnpm run watch
+        - cd ./emacs-preview; npm run watch
