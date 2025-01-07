@@ -201,8 +201,6 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
-;(add-to-list 'default-frame-alist '(font . "UDEV Gothic-14"))
-
 (defun gn/open-config-file ()
   (interactive)
   (find-file (expand-file-name "init.org" user-emacs-directory)))
@@ -222,6 +220,9 @@
 
 ;; use spaces instead of tabs
 (setq-default indent-tabs-mode nil)
+
+;; set tab spacing
+(setq-default tab-width 4)
 
 (defun gn/search-only-visible-text ()
   (setq-local search-invisible nil))
@@ -327,33 +328,36 @@
 )
 
 (use-package yasnippet
-  :ensure yasnippet-snippets
   :config
   (yas-global-mode 1))
 
+(buffer-file-name)
+
+()
+
 (use-package tempel
   ;; Require trigger prefix before template name when completing.
-  :custom
-  (tempel-trigger-prefix ".")
+  ;; :custom
+  ;; (tempel-trigger-prefix ".")
 
-  :config
-  (setq tempel-path (expand-file-name "templates.eld" user-emacs-directory))
+  ;; :config
+  ;; (setq tempel-path (expand-file-name "templates.eld" user-emacs-directory))
 
   ;; Setup completion at point
-  (defun tempel-setup-capf ()
-    ;; Add the Tempel Capf to `completion-at-point-functions'.
-    ;; `tempel-expand' only triggers on exact matches. Alternatively use
-    ;; `tempel-complete' if you want to see all matches, but then you
-    ;; should also configure `tempel-trigger-prefix', such that Tempel
-    ;; does not trigger too often when you don't expect it. NOTE: We add
-    ;; `tempel-expand' *before* the main programming mode Capf, such
-    ;; that it will be tried first.
-    (setq-local completion-at-point-functions
-                (cons #'tempel-complete
-                      completion-at-point-functions)))
+  ;; (defun tempel-setup-capf ()
+  ;;   ;; Add the Tempel Capf to `completion-at-point-functions'.
+  ;;   ;; `tempel-expand' only triggers on exact matches. Alternatively use
+  ;;   ;; `tempel-complete' if you want to see all matches, but then you
+  ;;   ;; should also configure `tempel-trigger-prefix', such that Tempel
+  ;;   ;; does not trigger too often when you don't expect it. NOTE: We add
+  ;;   ;; `tempel-expand' *before* the main programming mode Capf, such
+  ;;   ;; that it will be tried first.
+  ;;   (setq-local completion-at-point-functions
+  ;;               (cons #'tempel-complete
+  ;;                     completion-at-point-functions)))
 
-  (general-add-hook '(conf-mode-hook prog-mode-hook text-mode-hook org-mode-hook)
-                    'tempel-setup-capf)
+  ;; (general-add-hook '(conf-mode-hook prog-mode-hook text-mode-hook org-mode-hook)
+  ;;                   'tempel-setup-capf)
 
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
@@ -412,43 +416,6 @@
 (def image-data \"" image-url "\")
 
 (def org-data nil)"))))
-
-;; Highlight the matching parenthesis
-(show-paren-mode t)
-
-;; Color the brackets 
-(use-package rainbow-delimiters
-  :ghook 'prog-mode-hook)
-
-(defun gn/paredit-add-space-for-delimiter-p (endp delimiter)
-  nil)
-
-;; Adds easier shortcut for editing Lisp. 
-(use-package paredit
-  :ghook ('(prog-mode-hook) #'enable-paredit-mode)
-  :config
-  (setq paredit-space-for-delimiter-predicates '(gn/paredit-add-space-for-delimiter-p))
-  :diminish nil)
-
-(defun gn/eval-region (start end)
-  (interactive "r")
-  (eval-region start end t))
-
-(use-package parseedn)
-
-(use-package cider
-  :ghook
-  'clojure-mode-hook
-  'clojurescript-mode-hook)
-
-(use-package clj-refactor)
-
-(use-package flycheck-clj-kondo
-  :config
-  (require 'flycheck-clj-kondo))
-
-(setq js-indent-level 2)
-(add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
 
 (use-package magit)
 
@@ -614,8 +581,7 @@ Running gn/org-dwim-at-point function...")
   (setq org-roam-dailies-directory "journal")
   :config
   (org-roam-db-autosync-mode)
-  (setq org-roam-node-display-template (concat (propertize "${tags} " 'face 'org-tag)
-                                               "${title}"))
+  (setq org-roam-node-display-template "${gn-title}")
 
   (setq org-roam-capture-templates
         '(("e" "evergreen note"
@@ -668,13 +634,13 @@ Running gn/org-dwim-at-point function...")
   )
 
 
-(cl-defmethod org-roam-node-gn-node-display ((node org-roam-node))
-  "Method used to display the org-roam node in the minibuffer."
+(cl-defmethod org-roam-node-gn-title ((node org-roam-node))
+  "Method used to display the org-roam node in the minibuffer. Used in the org-roam-node-display-template variable."
   (let ((title (org-roam-node-title node))
         (file-title (org-roam-node-file-title node)))
     (if (string= title file-title)
         title
-      (concat file-title ": " title))))
+      (concat (propertize (concat "~" file-title "~") 'face 'org-date) " " title))))
 
 (use-package websocket
   :after org-roam)
@@ -828,6 +794,63 @@ Running gn/org-dwim-at-point function...")
           "^\\.sl$"
           "^\\.jj$")))
 
+(setq treesit-language-source-alist
+      '())
+
+;; Highlight the matching parenthesis
+(show-paren-mode t)
+
+;; Color the brackets 
+(use-package rainbow-delimiters
+  :ghook 'prog-mode-hook)
+
+(defun gn/paredit-add-space-for-delimiter-p (endp delimiter)
+  nil)
+
+;; Adds easier shortcut for editing Lisp. 
+(use-package paredit
+  :ghook ('(prog-mode-hook) #'enable-paredit-mode)
+  :config
+  (setq paredit-space-for-delimiter-predicates '(gn/paredit-add-space-for-delimiter-p))
+  :diminish nil)
+
+(defun gn/eval-region (start end)
+  (interactive "r")
+  (eval-region start end t))
+
+(use-package parseedn)
+
+(use-package cider
+  :ghook
+  'clojure-mode-hook
+  'clojurescript-mode-hook)
+
+(use-package clj-refactor)
+
+(use-package flycheck-clj-kondo
+  :config
+  (require 'flycheck-clj-kondo))
+
+(setq js-indent-level 2)
+(add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
+
+(use-package go-ts-mode
+  :hook
+  (go-ts-mode . lsp-deferred)
+  (go-ts-mode . go-format-on-save-mode)
+  :init
+  (add-to-list 'treesit-language-source-alist '(go "https://github.com/tree-sitter/tree-sitter-go" "v0.19.1"))
+  (add-to-list 'treesit-language-source-alist '(gomod "https://github.com/camdencheek/tree-sitter-go-mod"))
+  ;; (dolist (lang '(go gomod)) (treesit-install-language-grammar lang))
+  (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+  (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
+  :config
+  (reformatter-define go-format
+    :program "goimports"
+    :args '("/dev/stdin"))
+  (setq go-ts-mode-indent-offset 4)
+  )
+
 (use-package eglot
   :config
   (add-to-list 'eglot-server-programs
@@ -885,6 +908,7 @@ Running gn/org-dwim-at-point function...")
   "or" '(org-roam-graph :wk "Org roam graph")
   "ot" '(gn/open-task-inbox :wk "Task inbox")
   "oc" '(gn/open-config-file :wk "Config file")
+  "os" '(yas-visit-snippet-file :wk "Open snippet")
 
   "i" '(:ignore t :wk "Insert")
   "is" '(yas-insert-snippet :wk "Insert snippet")
@@ -972,6 +996,9 @@ Running gn/org-dwim-at-point function...")
 
 (general-def 'v clojure-mode-map
   "M-RET" 'cider-eval-region)
+
+(general-def 'n cider-mode-map
+  "=" 'cider-format-buffer)
 
 (general-def 'n magit-status-mode-map
   ;; Magit binds the M-w to another command, so change it back to my keybinding

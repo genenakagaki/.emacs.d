@@ -291,22 +291,12 @@ Hydra
     (doom-themes-org-config))
 #+end_src
 
-Font
-日本語のプログラミングフォントを使う
-1. Download the font here
-   https://github.com/yuru7/udev-gothic
-2. [[id:5DACFE1E-4969-4F9A-B006-120C87091534][Install a new font]] 
-3. Set the new font below 
-#+begin_src emacs-lisp :tangle yes :results none
-  ;(add-to-list 'default-frame-alist '(font . "UDEV Gothic-14"))
-#+end_src
-
 ** File
 #+begin_src emacs-lisp :tangle yes
   (defun gn/open-config-file ()
     (interactive)
     (find-file (expand-file-name "init.org" user-emacs-directory)))
-  
+
   ;; based on http://emacsredux.com/blog/2013/04/03/delete-file-and-buffer/
   (defun gn/delete-current-file ()
     "Kill the current buffer and deletes the file it is visiting."
@@ -325,6 +315,9 @@ Font
 #+begin_src emacs-lisp :tangle yes
   ;; use spaces instead of tabs
   (setq-default indent-tabs-mode nil)
+
+  ;; set tab spacing
+  (setq-default tab-width 4)
 #+end_src
 
 ** Searching
@@ -457,38 +450,43 @@ In-buffer completion
 
 ** Template
 yasnippet
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle yes :results none
   (use-package yasnippet
-    :ensure yasnippet-snippets
     :config
     (yas-global-mode 1))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes :results silent
+  (buffer-file-name)
+
+  ()
 #+end_src
 
 Tempel
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package tempel
     ;; Require trigger prefix before template name when completing.
-    :custom
-    (tempel-trigger-prefix ".")
+    ;; :custom
+    ;; (tempel-trigger-prefix ".")
 
-    :config
-    (setq tempel-path (expand-file-name "templates.eld" user-emacs-directory))
+    ;; :config
+    ;; (setq tempel-path (expand-file-name "templates.eld" user-emacs-directory))
 
     ;; Setup completion at point
-    (defun tempel-setup-capf ()
-      ;; Add the Tempel Capf to `completion-at-point-functions'.
-      ;; `tempel-expand' only triggers on exact matches. Alternatively use
-      ;; `tempel-complete' if you want to see all matches, but then you
-      ;; should also configure `tempel-trigger-prefix', such that Tempel
-      ;; does not trigger too often when you don't expect it. NOTE: We add
-      ;; `tempel-expand' *before* the main programming mode Capf, such
-      ;; that it will be tried first.
-      (setq-local completion-at-point-functions
-                  (cons #'tempel-complete
-                        completion-at-point-functions)))
+    ;; (defun tempel-setup-capf ()
+    ;;   ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;;   ;; `tempel-expand' only triggers on exact matches. Alternatively use
+    ;;   ;; `tempel-complete' if you want to see all matches, but then you
+    ;;   ;; should also configure `tempel-trigger-prefix', such that Tempel
+    ;;   ;; does not trigger too often when you don't expect it. NOTE: We add
+    ;;   ;; `tempel-expand' *before* the main programming mode Capf, such
+    ;;   ;; that it will be tried first.
+    ;;   (setq-local completion-at-point-functions
+    ;;               (cons #'tempel-complete
+    ;;                     completion-at-point-functions)))
 
-    (general-add-hook '(conf-mode-hook prog-mode-hook text-mode-hook org-mode-hook)
-                      'tempel-setup-capf)
+    ;; (general-add-hook '(conf-mode-hook prog-mode-hook text-mode-hook org-mode-hook)
+    ;;                   'tempel-setup-capf)
 
     ;; Optionally make the Tempel templates available to Abbrev,
     ;; either locally or globally. `expand-abbrev' is bound to C-x '.
@@ -577,58 +575,6 @@ https://www.gnu.org/software/tramp/#Remote-shell-setup
 
   (def org-data nil)"))))
 #+end_src
-** Programming Language
-
-#+begin_src emacs-lisp :tangle yes
-  ;; Highlight the matching parenthesis
-  (show-paren-mode t)
-
-  ;; Color the brackets 
-  (use-package rainbow-delimiters
-    :ghook 'prog-mode-hook)
-
-  (defun gn/paredit-add-space-for-delimiter-p (endp delimiter)
-    nil)
-
-  ;; Adds easier shortcut for editing Lisp. 
-  (use-package paredit
-    :ghook ('(prog-mode-hook) #'enable-paredit-mode)
-    :config
-    (setq paredit-space-for-delimiter-predicates '(gn/paredit-add-space-for-delimiter-p))
-    :diminish nil)
-#+end_src
-
-*** Emacs Lisp 
-#+begin_src emacs-lisp :tangle yes :results none
-  (defun gn/eval-region (start end)
-    (interactive "r")
-    (eval-region start end t))
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes :results none
-  (use-package parseedn)
-#+end_src
-
-*** Clojure
-#+begin_src emacs-lisp :tangle yes
-  (use-package cider
-    :ghook
-    'clojure-mode-hook
-    'clojurescript-mode-hook)
-
-  (use-package clj-refactor)
-
-  (use-package flycheck-clj-kondo
-    :config
-    (require 'flycheck-clj-kondo))
-#+end_src
-
-*** JavaScript
-#+begin_src emacs-lisp :tangle yes
-  (setq js-indent-level 2)
-  (add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
-#+end_src
-
 ** Git client (Magit)
 #+begin_src emacs-lisp :tangle yes
   (use-package magit)
@@ -826,8 +772,7 @@ Vim keybinding
     (setq org-roam-dailies-directory "journal")
     :config
     (org-roam-db-autosync-mode)
-    (setq org-roam-node-display-template (concat (propertize "${tags} " 'face 'org-tag)
-                                                 "${title}"))
+    (setq org-roam-node-display-template "${gn-title}")
 
     (setq org-roam-capture-templates
           '(("e" "evergreen note"
@@ -880,13 +825,13 @@ Vim keybinding
     )
 
 
-  (cl-defmethod org-roam-node-gn-node-display ((node org-roam-node))
-    "Method used to display the org-roam node in the minibuffer."
+  (cl-defmethod org-roam-node-gn-title ((node org-roam-node))
+    "Method used to display the org-roam node in the minibuffer. Used in the org-roam-node-display-template variable."
     (let ((title (org-roam-node-title node))
           (file-title (org-roam-node-file-title node)))
       (if (string= title file-title)
           title
-        (concat file-title ": " title))))
+        (concat (propertize (concat "~" file-title "~") 'face 'org-date) " " title))))
 
   (use-package websocket
     :after org-roam)
@@ -1074,6 +1019,86 @@ Org todo settings
             "^\\.jj$")))
 #+end_src
 
+** Tree sitter
+#+begin_src emacs-lisp :tangle yes :results silent
+  (setq treesit-language-source-alist
+        '())
+#+end_src
+
+
+** Programming Language
+
+#+begin_src emacs-lisp :tangle yes
+  ;; Highlight the matching parenthesis
+  (show-paren-mode t)
+
+  ;; Color the brackets 
+  (use-package rainbow-delimiters
+    :ghook 'prog-mode-hook)
+
+  (defun gn/paredit-add-space-for-delimiter-p (endp delimiter)
+    nil)
+
+  ;; Adds easier shortcut for editing Lisp. 
+  (use-package paredit
+    :ghook ('(prog-mode-hook) #'enable-paredit-mode)
+    :config
+    (setq paredit-space-for-delimiter-predicates '(gn/paredit-add-space-for-delimiter-p))
+    :diminish nil)
+#+end_src
+
+*** Emacs Lisp 
+#+begin_src emacs-lisp :tangle yes :results none
+  (defun gn/eval-region (start end)
+    (interactive "r")
+    (eval-region start end t))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes :results none
+  (use-package parseedn)
+#+end_src
+
+*** Clojure
+#+begin_src emacs-lisp :tangle yes
+  (use-package cider
+    :ghook
+    'clojure-mode-hook
+    'clojurescript-mode-hook)
+
+  (use-package clj-refactor)
+
+  (use-package flycheck-clj-kondo
+    :config
+    (require 'flycheck-clj-kondo))
+#+end_src
+
+*** JavaScript
+#+begin_src emacs-lisp :tangle yes
+  (setq js-indent-level 2)
+  (add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
+#+end_src
+
+*** Golang
+#+begin_src emacs-lisp :tangle yes :results silent
+  (use-package go-ts-mode
+    :hook
+    (go-ts-mode . lsp-deferred)
+    (go-ts-mode . go-format-on-save-mode)
+    :init
+    (add-to-list 'treesit-language-source-alist '(go "https://github.com/tree-sitter/tree-sitter-go" "v0.19.1"))
+    (add-to-list 'treesit-language-source-alist '(gomod "https://github.com/camdencheek/tree-sitter-go-mod"))
+    ;; (dolist (lang '(go gomod)) (treesit-install-language-grammar lang))
+    (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
+    (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
+    :config
+    (reformatter-define go-format
+      :program "goimports"
+      :args '("/dev/stdin"))
+    (setq go-ts-mode-indent-offset 4)
+    )
+#+end_src
+
+
 ** LSP (Eglot)
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package eglot
@@ -1124,6 +1149,7 @@ Help command override
 
   (general-def '(n m)
     "s" 'avy-goto-char-2)
+
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
@@ -1145,6 +1171,7 @@ Help command override
     "or" '(org-roam-graph :wk "Org roam graph")
     "ot" '(gn/open-task-inbox :wk "Task inbox")
     "oc" '(gn/open-config-file :wk "Config file")
+    "os" '(yas-visit-snippet-file :wk "Open snippet")
 
     "i" '(:ignore t :wk "Insert")
     "is" '(yas-insert-snippet :wk "Insert snippet")
@@ -1204,6 +1231,7 @@ TempEL
 #+end_src
 
 *** Programming Language
+**** Eglot 
 #+begin_src emacs-lisp :tangle yes :results none
   (general-def 'n eglot-mode-map
     "C-<return>" #'eglot-code-actions
@@ -1248,7 +1276,8 @@ TempEL
 #+end_src
 
 **** Clojure
-#+begin_src emacs-lisp :tangle yes
+
+#+begin_src emacs-lisp :tangle yes :results silent
   (general-def 'n clojure-mode-map
     "M-RET" 'cider-eval-last-sexp)
 
@@ -1257,6 +1286,9 @@ TempEL
 
   (general-def 'v clojure-mode-map
     "M-RET" 'cider-eval-region)
+
+  (general-def 'n cider-mode-map
+    "=" 'cider-format-buffer)
 #+end_src
 
 *** Magit
