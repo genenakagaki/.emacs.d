@@ -153,7 +153,7 @@ Shell configuration
 
     ;; Set the key specific to MacOS
     (setq mac-command-modifier 'meta)
-    (setq mac-option-modifier 'option))
+    (setq mac-option-modifier 'super))
 #+end_src
 
 Clipboard (copy and paste) configuration
@@ -1234,7 +1234,7 @@ TempEL
 **** Eglot 
 #+begin_src emacs-lisp :tangle yes :results none
   (general-def 'n eglot-mode-map
-    "C-<return>" #'eglot-code-actions
+    "s-<return>" #'eglot-code-actions
     "<f6>" #'eglot-rename
     "=" #'eglot-format-buffer)
 #+end_src

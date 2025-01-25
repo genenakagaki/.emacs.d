@@ -102,7 +102,7 @@
 
   ;; Set the key specific to MacOS
   (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'option))
+  (setq mac-option-modifier 'super))
 
 ;; This works for copying, but not pasting for some reason
 
@@ -955,7 +955,7 @@ Running gn/org-dwim-at-point function...")
 ;;   "S-RET" #'tempel-previous)
 
 (general-def 'n eglot-mode-map
-  "C-<return>" #'eglot-code-actions
+  "s-<return>" #'eglot-code-actions
   "<f6>" #'eglot-rename
   "=" #'eglot-format-buffer)
 
