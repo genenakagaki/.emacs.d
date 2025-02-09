@@ -1,26 +1,17 @@
 {
-  "name": "genenakagaki.blog.frontend",
+  "name": "gn-preview",
+  "version": "1.0.0",
+  "description": "Tool for previewing things in Emacs",
+  "main": "index.js",
   "scripts": {
-    "ancient": "clojure -Sdeps '{:deps {com.github.liquidz/antq {:mvn/version \"RELEASE\"}}}' -m antq.core",
-    "css-build": "npx tailwindcss -i ./src/tailwind.css -o ./resources/public/css/compiled/style.css",
-    "css-watch": "npm run css-build -- --watch",
-    "watch": "npx shadow-cljs watch app",
-    "release": "npx shadow-cljs release app",
-    "build-report": "npx shadow-cljs run shadow.cljs.build-report app target/build-report.html",
-    "ci": "npx shadow-cljs compile karma-test && npx karma start --single-run --reporters junit,dots"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs:dev": "vitepress dev --port 4701",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview"
   },
-  "dependencies": {
-    "highlight.js": "11.5.1",
-    "react": "17.0.2",
-    "react-dom": "17.0.2"
-  },
+  "author": "Gene Nakagaki",
+  "license": "ISC",
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.10",
-    "karma": "6.4.0",
-    "karma-chrome-launcher": "3.1.1",
-    "karma-cljs-test": "0.1.0",
-    "karma-junit-reporter": "2.0.1",
-    "shadow-cljs": "2.20.5",
-    "tailwindcss": "^3.3.3"
+    "vitepress": "^1.6.3"
   }
 }
