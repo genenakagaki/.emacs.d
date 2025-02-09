@@ -404,18 +404,18 @@
 ;;       explicit-shell-file-name "/bin/bash"
 ;;       )
 
-(defvar gn/preview-file (expand-file-name "emacs-preview/src/emacs/preview/data.cljs"
+(defvar gn/preview-file (expand-file-name "emacs-preview/preview.md"
                                           user-emacs-directory))
 
 (defun gn/preview-image (image-url)
   "Preview IMAGE-URL image."
   (with-temp-file gn/preview-file
     (progn
-      (insert "(ns emacs.preview.data)
+      (insert "---
+layout: home
+---
 
-(def image-data \"" image-url "\")
-
-(def org-data nil)"))))
+![An image]("image-url")"))))
 
 (use-package magit)
 
@@ -581,31 +581,43 @@ Running gn/org-dwim-at-point function...")
   (setq org-roam-dailies-directory "journal")
   :config
   (org-roam-db-autosync-mode)
-  (setq org-roam-node-display-template "${gn-title}")
+  (setq org-roam-node-display-template "${tags} ${gn-title}")
 
   (setq org-roam-capture-templates
-        '(("e" "evergreen note"
+        '(("a" "atomic"
            plain "%?"
            :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
-                              "
-#+language: en
-#+filetags: :evergreen:
-#+title: ${title}
+                              "#+title: ${title}
 
-* Description")
+Tags:
+- 
+
+References:
+- 
+
+* {{{title}}}")
            :immediate-finish
            :jump-to-captured)
-          ("r" "reference note"
+
+          ("s" "source"
            plain "%?"
            :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
-                              "
-#+language: en
-#+filetags: :reference:
-#+title: ${title}
+                              "#+title: ${title}
+#+filetags: :source:
 
-* Description")
+")
            :immediate-finish
-           :jump-to-captured)))
+           :jump-to-captured)
+
+          ("t" "tag"
+           plain "%?"
+           :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+                              "#+title: ${title}
+#+filetags: :tag:")
+           :immediate-finish
+           :jump-to-captured)
+
+          ))
 
   (setq org-roam-dailies-capture-templates
         '(("d" "default"
@@ -624,15 +636,7 @@ Running gn/org-dwim-at-point function...")
 * Self monitoring record
 ")
            :immediate-finish
-           :jump-to-captured)))
-
-  ;; emacs preview
-  (load (expand-file-name "emacs-preview/src/ox-edn.el" user-emacs-directory))
-  ;; (general-add-hook 'org-mode-hook 
-  ;;                   (lambda ()
-  ;;                     (general-add-hook 'after-save-hook 'gn/ox-export-as-edn)))
-  )
-
+           :jump-to-captured))))
 
 (cl-defmethod org-roam-node-gn-title ((node org-roam-node))
   "Method used to display the org-roam node in the minibuffer. Used in the org-roam-node-display-template variable."
@@ -694,7 +698,8 @@ Running gn/org-dwim-at-point function...")
   (interactive)
   (find-file (concat org-roam-directory "/todo.org")))
 
-(setq org-export-headline-levels 6)
+(setq org-export-headline-levels 6
+      org-export-with-toc nil)
 
 (use-package request)
 
