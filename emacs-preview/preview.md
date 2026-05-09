@@ -1,36 +1,5 @@
-Tags:
+---
+layout: home
+---
 
--   [Note Taking](20241112132027.md)
--   [How I do stuff](20250209192043.md)
-
-
-# How I do knowledge management / note taking
-
-I take notes using the [Zettelkasten Method](20221208132210.md) with [Org Roam](20240330111506.md) as my tool.
-
-    @startuml 
-    abstract Note {
-        + id 
-        + title
-    }
-    
-    entity AtomicNote <<Note>> {
-        + tags
-        + references
-    }
-    
-    entity SourceMaterialNote <<Note>> {
-    }
-    
-    entity TagNote <<Note>> {
-    }
-    
-    entity StructureNote <<Note>> {
-    }
-    
-    StructureNote --> AtomicNote
-    AtomicNote --> SourceMaterialNote: references
-    AtomicNote --> TagNote: tags
-    
-    @enduml
-
+![An image](http://localhost:4700/png/vLTRRn9157xdLsnuKbAJmk9BgqsCYI-Q66Dy9YkibRW2OPSOapumGsrBhwHMUecchTgBLQczsxJ2ZnbsbpxrBtXczhui3UsB6Wc1tJFddE_CTxup2v8uA6PId9BDXJXu9RCfCL6GXK6Hb4P8wPIKggJqbQ3QtQnKU9c12r8QfNRSQ6rzqnQcGopirbCX-Q9FoEMaT59GqjdCW3R_KVs-O4GnbqYa88kfHFPLHimdqgb8nB1o-lvnysI2e0rzyUHiSfUWUOAMIMcTWHpIJrIpWin44OwWBOBVGX3af0i4BH1SebOqV7wwRFkfRyRqjIfai98l4WnOcmHD4RHD4AIegSNF17qXQCHOTS8P5mnQVfxE1TICznX3vQ0AhuZiOZCdIE9WNXI1o-gFrlgCXqiXanHb9Pjlex6DlI8Yg4wD5FK3Qw27MxjGaqg7Otn4y36JmOgLlQQkxAkLCPhBaW4Z7L0t7jvtg4k9SX9a9MIKjWBV4JpPtc4_k4Sh1CysVm7G9uBM2SQjyhQtpMt-wAkjYzgz-n3UsWMe2TC_Bqg20kufCQSyxww-JPkbi-h7PWF3XNQq0yvsocTYFYz8YNose8Y-dFh1PEjeEtJXVC4Rj30C6pH3VUEdpzJryKER7djeQ3zHWxA3PrZXwpIBlLNBitcofdwkKd-C6PLZuAFjJEjpc_hIC6sXlvejasvNDcixSvjCHRw0-GxDuVJAY3wt4pq_NJ9q3C5UkjWSVG6LWQmC2BKyfSrKEjLXvun1JginKDE4tHwj21kTLT-iKKhesC5fKOP9U0AgCERH8gHs9qcFAs36rHd0TTGzITFG6fOjxJkhPwDqDzheJxLn09u4ONUHwdPTRRpNgiVQtZker67FJnqTVZDv4QcLAMTKwUJMQTjS8OyVFQ1BbBHLKe9FA6d3E8nRZL_g-4e89azYntee92j2Ne4lE9WLZbLsOy0jxMXlb1A7oqPr_SobhmcylbsDziRiyyidNdOxTDixTjJGTcPIetLOqMldPA1tdb4q36vbS4C64EUye2ZFlM6BMZRNPP0lNGo3JmyiXGtJK7yea9VO1RpmVoClV00lCOUNc9iNFfYN6F32Mxnq2T69Uhzlp4Mz2KEf3oQVlu3y-9yctq2HNykA-B9hck8EJV4kEX5tTU8IpN2Xy5qqW-_f2YaUWCHtG8e7xuSXNHwbatxZmVjXmdAGkaNf966_B--Ji85qQPHCGP8kWZ7Nmv0QH1QzoZOy4hlPMM8tmwuXbEcV0FDH8GmAwOmrcguVWjTwh__xpmkEwmKRezbmjozzD-m-7FQ4ChxQpoo35K3xVnyO_IuLqV-KJ4c_0G00)

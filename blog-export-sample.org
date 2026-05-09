@@ -92,17 +92,17 @@ Ordered lists
         example block
       #+end_example
 3. markup
-   - *bold*
-   - /italic/
-   - _underlined_
-   - =verbatim=
-   - ~code~
-   - +strike-through+
+   1. *bold*
+   2. /italic/
+   3. _underlined_
+   4. =verbatim=
+   5. ~code~
+   6. +strike-through+
 4. hyperlinks
-   - [[https://orgmode.org/manual/index.html]] 
-   - [[https://orgmode.org/manual/index.html][link with description]] 
-   - [[https://orgmode.org/manual/index.html][link]] with text after
-   - text before [[https://orgmode.org/manual/index.html][link]] 
+   1. [[https://orgmode.org/manual/index.html]] 
+   2. [[https://orgmode.org/manual/index.html][link with description]] 
+   3. [[https://orgmode.org/manual/index.html][link]] with text after
+   4. text before [[https://orgmode.org/manual/index.html][link]] 
 5. alternative bullet type 1
    1) type 1 first item
    2) type 1 second item

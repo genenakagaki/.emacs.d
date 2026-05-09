@@ -129,6 +129,11 @@
   (interactive)
   (set-window-dedicated-p (selected-window) (not (window-dedicated-p (selected-window)))))
 
+(use-package undo-tree
+  :init
+  (setq undo-tree-history-directory-alist '(("." . "~/.emacs.d/undo")))
+  (global-undo-tree-mode))
+
 ;; vim emulation
 (use-package evil
   :after goto-chg
@@ -138,7 +143,7 @@
    ;; This needs to be nil in order for 'evil-collection' to work
    evil-want-keybinding nil
    ;; Setup undo system 
-   evil-undo-system 'undo-redo
+   evil-undo-system 'undo-tree
    ;; fine grain undo
    evil-want-fine-undo t
    )
@@ -519,6 +524,8 @@ Running gn/org-dwim-at-point function...")
    ;; Remove clock times that are less than a minute
    org-clock-out-remove-zero-time-clocks t
 
+   ;; Format to show in the clock report (prevent days from showing up)
+   org-duration-format 'h:mm
 
 
    ;; https://github.com/abo-abo/swiper/issues/986
@@ -576,32 +583,29 @@ Running gn/org-dwim-at-point function...")
 (use-package org-roam
   :after org
   :init
-  (setq org-roam-directory "~/org-roam")
+  (setq org-roam-directory "~/knowledge")
   (setq org-roam-db-location (concat org-roam-directory "/org-roam.db"))
   (setq org-roam-dailies-directory "journal")
   :config
   (org-roam-db-autosync-mode)
-  (setq org-roam-node-display-template "${tags} ${gn-title}")
+  ;; (setq org-roam-node-display-template "${tags} ${gn-title}")
+  (setq org-roam-node-display-template "${title} ${tags}")
+  (setq org-roam-extract-new-file-path "note/%<%Y-%m-%d-%H%M>.org")
 
   (setq org-roam-capture-templates
-        '(("a" "atomic"
+        '(("p" "project"
            plain "%?"
-           :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+           :target (file+head "./note/%<%Y-%m-%d-%H%M>.org"
                               "#+title: ${title}
+#+filetags: :project:
 
-Tags:
-- 
-
-References:
-- 
-
-* {{{title}}}")
+")
            :immediate-finish
            :jump-to-captured)
 
           ("s" "source"
            plain "%?"
-           :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
+           :target (file+head "./note/%<%Y%m%d%H%M>.org"
                               "#+title: ${title}
 #+filetags: :source:
 
@@ -609,13 +613,6 @@ References:
            :immediate-finish
            :jump-to-captured)
 
-          ("t" "tag"
-           plain "%?"
-           :target (file+head "./node/%<%Y%m%d%H%M%S>.org"
-                              "#+title: ${title}
-#+filetags: :tag:")
-           :immediate-finish
-           :jump-to-captured)
 
           ))
 
@@ -638,13 +635,13 @@ References:
            :immediate-finish
            :jump-to-captured))))
 
-(cl-defmethod org-roam-node-gn-title ((node org-roam-node))
-  "Method used to display the org-roam node in the minibuffer. Used in the org-roam-node-display-template variable."
-  (let ((title (org-roam-node-title node))
-        (file-title (org-roam-node-file-title node)))
-    (if (string= title file-title)
-        title
-      (concat (propertize (concat "~" file-title "~") 'face 'org-date) " " title))))
+;; (cl-defmethod org-roam-node-gn-title ((node org-roam-node))
+;;   "Method used to display the org-roam node in the minibuffer. Used in the org-roam-node-display-template variable."
+;;   (let ((title (org-roam-node-title node))
+;;         (file-title (org-roam-node-file-title node)))
+;;     (if (string= title file-title)
+;;         title
+;;       (concat (propertize (concat "~" file-title "~") 'face 'org-date) " " title))))
 
 (use-package websocket
   :after org-roam)
@@ -767,6 +764,11 @@ References:
   (add-to-list 'auto-mode-alist
                '("\\.yml\\'" . yaml-mode)))
 
+(use-package terraform-mode
+  :config
+  (add-hook 'terraform-mode-hook 'my-terraform-mode-init)
+  )
+
 (use-package docker)
 
 (setq dired-dwim-target t)
@@ -839,6 +841,10 @@ References:
 (setq js-indent-level 2)
 (add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
 
+(use-package vue-mode
+  :config
+  (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
+
 (use-package go-ts-mode
   :hook
   (go-ts-mode . lsp-deferred)
@@ -861,6 +867,9 @@ References:
   (add-to-list 'eglot-server-programs
                `(csharp-mode . ("Omnisharp" "-lsp"))))
 
+(use-package lsp-mode
+  :hook (clojure-mode . lsp))
+
 (general-def '(n i v) 'override
   "M-z" 'evil-force-normal-state)
 
@@ -872,7 +881,7 @@ References:
 
 (defvar gn/leader-key "SPC")
 
-(general-def 'n 'override
+(general-def 'n 
   "j" 'evil-next-visual-line
   "k" 'evil-previous-visual-line
   "<down>" 'evil-next-visual-line
@@ -969,20 +978,30 @@ References:
   "(" 'paredit-open-round
   "[" 'paredit-open-square
   "{" 'paredit-open-curly
+
+  "<left>" 'paredit-backward
+  "<right>" 'paredit-forward
+  "<up>" 'paredit-backward-up
+  "<down>" 'paredit-forward-down
   ;; angled brackets turned off due to messed up formatting
   ;; "<" 'paredit-open-angled
   )
+
+(general-def 'n paredit-mode-map
+  ;; Add matching closing parenthesis.
+
+  ;; angled brackets turned off due to messed up formatting
+  ;; "<" 'paredit-open-angled
+  )
+
 (general-def 'n paredit-mode-map
   :prefix gn/leader-key
-  "dw" #'paredit-splice-sexp
-  "s" #'paredit-forward-slurp-sexp
-  "S" #'paredit-backward-slurp-sexp
-  "b" #'paredit-forward-barf-sexp
-  "B" #'paredit-backward-barf-sexp
-  "gl" #'paredit-forward
-  "gh" #'paredit-backward
-  "gj" #'paredit-forward-down
-  "gk" #'paredit-backward-up)
+  "dw" 'paredit-splice-sexp
+  "s" 'paredit-forward-slurp-sexp
+  "S" 'paredit-backward-slurp-sexp
+  "b" 'paredit-forward-barf-sexp
+  "B" 'paredit-backward-barf-sexp
+  )
 
 (general-def '(n v) emacs-lisp-mode-map
   "M-/" 'comment-dwim)
