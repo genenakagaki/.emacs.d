@@ -88,8 +88,6 @@
 ;; show how many packages were loaded, what stage of initialization they've reached, and how much aggregate time they've spent (roughly)
 (setq use-package-compute-statistics t)
 
-(use-package use-package-ensure-system-package)
-
 ;; Is using MacOS?
 (defun gn/macos-p ()
   (equal system-type 'darwin))
@@ -124,6 +122,11 @@
 
 (use-package tree-sitter)
 (use-package tree-sitter-langs)
+
+(setq treesit-language-source-alist
+      '((json "https://github.com/tree-sitter/tree-sitter-json")))
+
+(treesit-install-language-grammar 'json)
 
 (defun gn/sticky-window/toggle ()
   (interactive)
@@ -223,11 +226,16 @@
               (kill-buffer)))
       (message "Not a file visiting buffer!"))))
 
+;; auto save current buffer
+(auto-save-visited-mode 1)
+
 ;; use spaces instead of tabs
 (setq-default indent-tabs-mode nil)
 
 ;; set tab spacing
 (setq-default tab-width 4)
+
+(electric-indent-mode -1)
 
 (defun gn/search-only-visible-text ()
   (setq-local search-invisible nil))
@@ -305,7 +313,7 @@
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since Dabbrev can be used globally (M-/).
   ;; See also `global-corfu-modes'.
-  :init
+  :config
   (global-corfu-mode))
 
 ;; Add extensions
@@ -373,6 +381,8 @@
 (setq ispell-program-name "aspell")
 
 (use-package helpful)
+
+(use-package vterm)
 
 (require 'tramp)
 
@@ -497,27 +507,32 @@ Running gn/org-dwim-at-point function...")
   ;; (setq truncate-lines nil)
   )
 
+(use-package ob-go)
+(use-package org-habit)
+
 (use-package org
   :gfhook 
   #'gn/org-fold-lines
   #'gn/search-only-visible-text
+  #'visual-line-mode
   :config
   (setq
    ;; Adjust indent to heading.
    org-startup-indented t
 
    ;; Set org-roam directory
-   org-directory "~/org-roam/"
+   org-directory "~/knowledge/"
 
    ;; Set org agenda
-   org-agenda-files `(,(concat org-directory "/todo.org"))
+   org-agenda-files `(,(concat org-directory "todo.org")
+                      ,(concat org-directory "habit.org"))
 
    ;; Open src window in current window
    org-src-window-setup 'current-window
 
    ;; Add the org todo state changes and timestamps into the property
    org-log-into-drawer "LOGBOOK"
-
+   
    ;; Add information to property when todo state changed to DONE
    org-log-done 'time
 
@@ -533,12 +548,24 @@ Running gn/org-dwim-at-point function...")
    org-goto-interface 'outline-path-completion
    ;; This needs to be nil for incremental search
    org-outline-path-complete-in-steps nil
+
+   org-file-apps '((auto-mode . emacs)
+                   (directory . emacs)
+                   ("\\.mm\\'" . default)
+                   ("\\.x?html?\\'" . default)
+                   ("\\.pdf\\'" . default))
+
+   org-modules '(ol-doi ol-w3m ol-bbdb ol-bibtex ol-docview ol-gnus ol-info ol-irc ol-mhe ol-rmail ol-eww habit)
+
    )
+
+
 
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((shell . t)
      (js . t)
+     (go . t)
      (sql . t)))
 
   ;; Disable flycheck for emacs literate configuration
@@ -593,11 +620,37 @@ Running gn/org-dwim-at-point function...")
   (setq org-roam-extract-new-file-path "note/%<%Y-%m-%d-%H%M>.org")
 
   (setq org-roam-capture-templates
-        '(("p" "project"
+        '(("a" "atomic note"
+           plain "%?"
+           :target (file+head "./note/%<%Y-%m-%d-%H%M>.org"
+                              "#+title: ${title}
+
+* Context
+
+* Body
+")
+           :immediate-finish
+           :jump-to-captured)
+          ("p" "project note"
            plain "%?"
            :target (file+head "./note/%<%Y-%m-%d-%H%M>.org"
                               "#+title: ${title}
 #+filetags: :project:
+
+* Context
+
+* Body
+")
+           :immediate-finish
+           :jump-to-captured)
+
+          ("r" "reference note"
+           plain "%?"
+           :target (file+head "./note/%<%Y-%m-%d-%H%M>.org"
+                              "#+title: ${title}
+#+filetags: :reference:
+
+* Context
 
 ")
            :immediate-finish
@@ -700,6 +753,15 @@ Running gn/org-dwim-at-point function...")
 
 (use-package request)
 
+(defun gn/plantuml-capf ()
+  "A clean Capf for plantuml-mode that only returns data."
+  (let ((bounds (bounds-of-thing-at-point 'symbol)))
+    (when (and bounds (derived-mode-p 'plantuml-mode))
+      (list (car bounds) (cdr bounds)
+            (if (boundp 'plantuml-kwdList) plantuml-kwdList '())
+            :exclusive 'no
+            :company-kind (lambda (_) 'keyword)))))
+
 (defun gn/preview-plantuml-image (encoded-plantuml-code)
   (let* ((image-url (concat plantuml-server-url "/png/" encoded-plantuml-code)))
     (message image-url)
@@ -731,6 +793,17 @@ Running gn/org-dwim-at-point function...")
   (general-add-hook (list 'after-save-hook 'plantuml-mode-hook) 
                     'gn/plantuml-preview)
 
+  (add-hook 'plantuml-mode-hook
+            (lambda ()
+              ;; Remove the legacy function that causes the side-buffer
+              (remove-hook 'completion-at-point-functions #'plantuml-complete-symbol t)
+              ;; Add our new clean function
+              (add-hook 'completion-at-point-functions #'gn/plantuml-capf nil t)))
+
+
+  )
+
+(use-package mermaid-mode
 
   )
 
@@ -766,7 +839,6 @@ Running gn/org-dwim-at-point function...")
 
 (use-package terraform-mode
   :config
-  (add-hook 'terraform-mode-hook 'my-terraform-mode-init)
   )
 
 (use-package docker)
@@ -840,10 +912,27 @@ Running gn/org-dwim-at-point function...")
 
 (setq js-indent-level 2)
 (add-to-list 'auto-mode-alist '("\\.mjs\\'" . javascript-mode))
+(add-to-list 'auto-mode-alist '("\\.ts\\'" . typescript-ts-mode))
+(add-to-list 'treesit-language-source-alist '(typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src"))
+(add-to-list 'treesit-language-source-alist '(tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src"))
+
+;; Set local indentation to 2 spaces for both TS and TSX
+(setq typescript-ts-mode-indent-offset 2)
+
+;; Apply 2-space indentation and match it for Eglot
+(add-hook 'typescript-ts-mode-hook
+          (lambda ()
+            (setq-local tab-width 2)))
+(add-hook 'tsx-ts-mode-hook
+          (lambda ()
+            (setq-local tab-width 2)))
 
 (use-package vue-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
+
+(use-package reformatter
+  :ensure t)
 
 (use-package go-ts-mode
   :hook
@@ -855,6 +944,8 @@ Running gn/org-dwim-at-point function...")
   ;; (dolist (lang '(go gomod)) (treesit-install-language-grammar lang))
   (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
   (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
+  (add-to-list 'org-src-lang-modes '("go" . go-ts))
+  :after reformatter 
   :config
   (reformatter-define go-format
     :program "goimports"
@@ -865,13 +956,29 @@ Running gn/org-dwim-at-point function...")
 (use-package eglot
   :config
   (add-to-list 'eglot-server-programs
-               `(csharp-mode . ("Omnisharp" "-lsp"))))
+               `(csharp-mode . ("Omnisharp" "-lsp")))
+  (add-to-list 'eglot-server-programs
+               `((typescript-ts-mode tsx-ts-mode js-ts-mode) 
+                 . ("/Users/gene/.asdf/installs/nodejs/22.1.0/bin/typescript-language-server" "--stdio")))
+  )
 
 (use-package lsp-mode
   :hook (clojure-mode . lsp))
 
+(unless (package-installed-p 'hurl-mode)
+  (package-vc-install "https://github.com/JasZhe/hurl-mode"))
+
+(use-package hurl-mode
+  :mode "\\.hurl\\'" 
+  :config 
+  (add-to-list 'auto-mode-alist '("\\.hurl\\'" . hurl-mode)))
+
 (general-def '(n i v) 'override
   "M-z" 'evil-force-normal-state)
+
+(general-def 
+  "s-t" nil ;; remove shortcut for menu-set-font
+  )
 
 (general-def '(n i v) 'override
   "C-h f" 'helpful-callable
@@ -905,7 +1012,7 @@ Running gn/org-dwim-at-point function...")
   "s" 'avy-goto-char-2)
 
 (general-def '(n i)
-  "M-w" 'kill-current-buffer
+  "M-w" 'delete-window
   "M-q" 'save-buffers-kill-terminal)
 
 (general-def '(n i) 'override
@@ -979,10 +1086,10 @@ Running gn/org-dwim-at-point function...")
   "[" 'paredit-open-square
   "{" 'paredit-open-curly
 
-  "<left>" 'paredit-backward
-  "<right>" 'paredit-forward
-  "<up>" 'paredit-backward-up
-  "<down>" 'paredit-forward-down
+  ;; "<left>" 'paredit-backward
+  ;; "<right>" 'paredit-forward
+  ;; "<up>" 'paredit-backward-up
+  ;; "<down>" 'paredit-forward-down
   ;; angled brackets turned off due to messed up formatting
   ;; "<" 'paredit-open-angled
   )
