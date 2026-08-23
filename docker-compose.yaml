@@ -1,5 +1,21 @@
 services:
   plantuml:
-    image: plantuml/plantuml-server:jetty
+    image: plantuml/plantuml-server:tomcat
     ports:
       - "4700:8080"
+
+  preview:
+    build: ./emacs-preview/
+    user: 1000:1000
+    volumes:
+      - ./emacs-preview/:/app
+      - preview_node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "4701:4701"
+    security_opt:
+      - no-new-privileges:true
+
+volumes:
+  preview_node_modules:

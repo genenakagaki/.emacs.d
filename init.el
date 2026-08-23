@@ -209,6 +209,10 @@
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
 
+;; Covers Kanji (Unified CJK Ideographs) こんにちはテスト
+(set-fontset-font t 'han (font-spec :family "Noto Sans CJK JP"))
+(set-fontset-font t 'kana (font-spec :family "Noto Sans CJK JP"))
+
 (defun gn/open-config-file ()
   (interactive)
   (find-file (expand-file-name "init.org" user-emacs-directory)))
@@ -432,6 +436,12 @@ layout: home
 
 ![An image]("image-url")"))))
 
+(use-package impatient-mode)
+(use-package simple-http)
+
+(setq markdown-command
+      "pandoc -f gfm -t html5 --standalone --embed-resources --css=/home/gene/.emacs.d/water.css")
+
 (use-package magit)
 
 (defun yas/org-very-safe-expand ()
@@ -508,7 +518,6 @@ Running gn/org-dwim-at-point function...")
   )
 
 (use-package ob-go)
-(use-package org-habit)
 
 (use-package org
   :gfhook 
@@ -524,8 +533,7 @@ Running gn/org-dwim-at-point function...")
    org-directory "~/knowledge/"
 
    ;; Set org agenda
-   org-agenda-files `(,(concat org-directory "todo.org")
-                      ,(concat org-directory "habit.org"))
+   org-agenda-files `(,(concat org-directory "todo.org"))
 
    ;; Open src window in current window
    org-src-window-setup 'current-window
@@ -931,13 +939,15 @@ Running gn/org-dwim-at-point function...")
   :config
   (add-to-list 'auto-mode-alist '("\\.vue\\'" . vue-mode)))
 
-(use-package reformatter
-  :ensure t)
-
 (use-package go-ts-mode
   :hook
-  (go-ts-mode . lsp-deferred)
-  (go-ts-mode . go-format-on-save-mode)
+  (go-ts-mode . eglot-ensure)
+  (go-ts-mode . (lambda ()
+                  (add-hook 'before-save-hook
+                             (lambda ()
+                               (when (eglot-managed-p)
+                                 (eglot-format-buffer)))
+                             nil t)))
   :init
   (add-to-list 'treesit-language-source-alist '(go "https://github.com/tree-sitter/tree-sitter-go" "v0.19.1"))
   (add-to-list 'treesit-language-source-alist '(gomod "https://github.com/camdencheek/tree-sitter-go-mod"))
@@ -945,11 +955,7 @@ Running gn/org-dwim-at-point function...")
   (add-to-list 'auto-mode-alist '("\\.go\\'" . go-ts-mode))
   (add-to-list 'auto-mode-alist '("/go\\.mod\\'" . go-mod-ts-mode))
   (add-to-list 'org-src-lang-modes '("go" . go-ts))
-  :after reformatter 
   :config
-  (reformatter-define go-format
-    :program "goimports"
-    :args '("/dev/stdin"))
   (setq go-ts-mode-indent-offset 4)
   )
 
@@ -958,8 +964,10 @@ Running gn/org-dwim-at-point function...")
   (add-to-list 'eglot-server-programs
                `(csharp-mode . ("Omnisharp" "-lsp")))
   (add-to-list 'eglot-server-programs
-               `((typescript-ts-mode tsx-ts-mode js-ts-mode) 
+               `((typescript-ts-mode tsx-ts-mode js-ts-mode)
                  . ("/Users/gene/.asdf/installs/nodejs/22.1.0/bin/typescript-language-server" "--stdio")))
+  (add-to-list 'eglot-server-programs
+               `(go-ts-mode . (,(expand-file-name "~/.config/dev-containers/go/gopls-bridge"))))
   )
 
 (use-package lsp-mode
@@ -1012,13 +1020,12 @@ Running gn/org-dwim-at-point function...")
   "s" 'avy-goto-char-2)
 
 (general-def '(n i)
-  "M-w" 'delete-window
-  "M-q" 'save-buffers-kill-terminal)
+  "C-q" 'save-buffers-kill-terminal)
 
 (general-def '(n i) 'override
-  "M-o" 'find-file
-  "M-e" 'switch-to-buffer
-  "M-s" 'save-buffer)
+  "C-o" 'find-file
+  "C-e" 'switch-to-buffer
+  "C-s" 'save-buffer)
 
 (general-def 'n 'override
   :prefix gn/leader-key
