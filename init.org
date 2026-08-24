@@ -143,7 +143,7 @@ Check if MacOS
 
 Shell configuration
 #+begin_src emacs-lisp :tangle yes
-  (when (and (gn/macos-p) (display-graphic-p))
+  (when (display-graphic-p)
     ;; Make environment variables from the user's shell available
     (use-package exec-path-from-shell
       :config
@@ -1236,13 +1236,11 @@ Org todo settings
 #+begin_src emacs-lisp :tangle yes :results none
   (use-package eglot
     :config
-    (add-to-list 'eglot-server-programs
-                 `(csharp-mode . ("Omnisharp" "-lsp")))
-    (add-to-list 'eglot-server-programs
-                 `((typescript-ts-mode tsx-ts-mode js-ts-mode)
-                   . ("/Users/gene/.asdf/installs/nodejs/22.1.0/bin/typescript-language-server" "--stdio")))
-    (add-to-list 'eglot-server-programs
-                 `(go-ts-mode . (,(expand-file-name "~/.config/dev-containers/go/gopls-bridge"))))
+    ;; (add-to-list 'eglot-server-programs
+    ;;              `(csharp-mode . ("Omnisharp" "-lsp")))
+    ;; (add-to-list 'eglot-server-programs
+    ;;              `((typescript-ts-mode tsx-ts-mode js-ts-mode)
+    ;;                . ("/Users/gene/.asdf/installs/nodejs/22.1.0/bin/typescript-language-server" "--stdio")))
     )
 
 #+end_src
@@ -1316,13 +1314,10 @@ Help command override
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
-  (general-def '(n i)
-    "C-q" 'save-buffers-kill-terminal)
-
   (general-def '(n i) 'override
-    "C-o" 'find-file
-    "C-e" 'switch-to-buffer
-    "C-s" 'save-buffer)
+    "M-o" 'find-file
+    "M-e" 'switch-to-buffer
+    "M-s" 'save-buffer)
 
   (general-def 'n 'override
     :prefix gn/leader-key

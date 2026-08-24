@@ -92,7 +92,7 @@
 (defun gn/macos-p ()
   (equal system-type 'darwin))
 
-(when (and (gn/macos-p) (display-graphic-p))
+(when (display-graphic-p)
   ;; Make environment variables from the user's shell available
   (use-package exec-path-from-shell
     :config
@@ -961,13 +961,11 @@ Running gn/org-dwim-at-point function...")
 
 (use-package eglot
   :config
-  (add-to-list 'eglot-server-programs
-               `(csharp-mode . ("Omnisharp" "-lsp")))
-  (add-to-list 'eglot-server-programs
-               `((typescript-ts-mode tsx-ts-mode js-ts-mode)
-                 . ("/Users/gene/.asdf/installs/nodejs/22.1.0/bin/typescript-language-server" "--stdio")))
-  (add-to-list 'eglot-server-programs
-               `(go-ts-mode . (,(expand-file-name "~/.config/dev-containers/go/gopls-bridge"))))
+  ;; (add-to-list 'eglot-server-programs
+  ;;              `(csharp-mode . ("Omnisharp" "-lsp")))
+  ;; (add-to-list 'eglot-server-programs
+  ;;              `((typescript-ts-mode tsx-ts-mode js-ts-mode)
+  ;;                . ("/Users/gene/.asdf/installs/nodejs/22.1.0/bin/typescript-language-server" "--stdio")))
   )
 
 (use-package lsp-mode
@@ -1019,13 +1017,10 @@ Running gn/org-dwim-at-point function...")
 (general-def '(n m)
   "s" 'avy-goto-char-2)
 
-(general-def '(n i)
-  "C-q" 'save-buffers-kill-terminal)
-
 (general-def '(n i) 'override
-  "C-o" 'find-file
-  "C-e" 'switch-to-buffer
-  "C-s" 'save-buffer)
+  "M-o" 'find-file
+  "M-e" 'switch-to-buffer
+  "M-s" 'save-buffer)
 
 (general-def 'n 'override
   :prefix gn/leader-key
