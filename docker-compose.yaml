@@ -4,6 +4,18 @@ services:
     ports:
       - "4700:8080"
 
+  mermaid:
+    image: ghcr.io/jihchi/mermaid.ink
+    ports:
+      - "4702:3000"
+    environment:
+      - CI=true
+
+  mermaid-live-editor:
+    image: ghcr.io/mermaid-js/mermaid-live-editor
+    ports:
+      - "4703:8080"
+
   preview:
     build: ./emacs-preview/
     user: 1000:1000

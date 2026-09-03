@@ -19,6 +19,9 @@
 (setq display-line-numbers-type 'relative)
 (global-display-line-numbers-mode t)
 
+;; Font size
+(set-face-attribute 'default nil :height 90)
+
 ;; Highlight current line
 (global-hl-line-mode t)
 
@@ -437,7 +440,6 @@ layout: home
 ![An image]("image-url")"))))
 
 (use-package impatient-mode)
-(use-package simple-http)
 
 (setq markdown-command
       "pandoc -f gfm -t html5 --standalone --embed-resources --css=/home/gene/.emacs.d/water.css")
@@ -811,8 +813,21 @@ Running gn/org-dwim-at-point function...")
 
   )
 
-(use-package mermaid-mode
+(defvar mermaid-server-url "http://localhost:4702")
 
+(defun gn/mermaid-preview ()
+  "Encodes current mermaid buffer and previews the rendered diagram."
+  (interactive)
+  (when (eq major-mode 'mermaid-mode)
+    (let* ((encoded (base64url-encode-string (buffer-string) t))
+           (image-url (concat mermaid-server-url "/svg/" encoded)))
+      (gn/preview-image image-url))))
+
+(use-package mermaid-mode
+  :config
+  (add-to-list 'org-src-lang-modes '("mermaid" . mermaid))
+  (general-add-hook (list 'after-save-hook 'mermaid-mode-hook)
+                    'gn/mermaid-preview)
   )
 
 (use-package know-your-http-well)
@@ -852,6 +867,17 @@ Running gn/org-dwim-at-point function...")
 (use-package docker)
 
 (setq dired-dwim-target t)
+
+(defun gn/dired-open-in-file-manager ()
+  "Open the file at point, or the current directory, in Nautilus."
+  (interactive)
+  (let ((process (start-process "nautilus" nil "nautilus" "--new-window"
+                                (or (dired-get-filename nil t) default-directory))))
+    ;; Don't ask about the running process when killing Emacs
+    (set-process-query-on-exit-flag process nil)))
+
+(with-eval-after-load 'dired
+  (define-key dired-mode-map (kbd "C-c o") #'gn/dired-open-in-file-manager))
 
 (use-package projectile
   :config
@@ -1078,7 +1104,7 @@ Running gn/org-dwim-at-point function...")
 ;;   "S-RET" #'tempel-previous)
 
 (general-def 'n eglot-mode-map
-  "s-<return>" #'eglot-code-actions
+  "M-<return>" #'eglot-code-actions
   "<f6>" #'eglot-rename
   "=" #'eglot-format-buffer)
 
