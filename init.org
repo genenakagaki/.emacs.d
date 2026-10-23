@@ -680,11 +680,6 @@ My functions
       (when debug-p
         (message "gn/org-dwim-at-point finished"))))
 
-  (pcase 'test
-    ((and 'testaa)
-     (message "hello"))
-    )
-
   (defun gn/org-fold-lines ()
     (turn-on-visual-line-mode)
 
@@ -865,15 +860,16 @@ Vim keybinding
              :immediate-finish
              :jump-to-captured)
 
-            ("s" "source"
+            ("s" "stoicism"
              plain "%?"
-             :target (file+head "./note/%<%Y%m%d%H%M>.org"
+             :target (file+head "./note/stoicism/%<%Y%m%d%H%M>.org"
                                 "#+title: ${title}
-  ,#+filetags: :source:
+  ,#+filetags: :Stoicism:
 
   ")
              :immediate-finish
              :jump-to-captured)
+            
 
 
             ))
@@ -971,7 +967,59 @@ Org todo settings
 *** Export
 #+begin_src emacs-lisp :tangle yes :results none
   (setq org-export-headline-levels 6
-        org-export-with-toc nil)
+        org-export-with-toc nil
+        ;; Require braces for sub/superscripts so `snake_case' identifiers
+        ;; survive export instead of turning into <sub> markup.
+        org-export-with-sub-superscripts '{})
+
+  ;; `ox-md' targets the original Markdown 1.0 spec, which has no fenced code
+  ;; blocks, so it renders every src block as a 4-space indented example and
+  ;; throws the language away.  Override the transcoder to emit GFM fences.
+
+  (defvar gn/org-md-language-alist
+    ;; Org babel language names that differ from the identifiers
+    ;; GitHub/Pandoc highlighters expect.  Anything absent falls through
+    ;; unchanged, which is already correct for json, python, bash, yaml, ...
+    '(("emacs-lisp" . "elisp")
+      ("lisp" . "commonlisp")
+      ("sh" . "bash")
+      ("shell" . "bash")
+      ("js" . "javascript")
+      ("ts" . "typescript")
+      ("ipython" . "python")
+      ("jupyter-python" . "python")
+      ("restclient" . "http")
+      ("sqlite" . "sql")
+      ("dot" . "graphviz")
+      ("conf" . "ini")
+      ("calc" . ""))
+    "Alist mapping Org babel language names to Markdown info strings.")
+
+  (defun gn/org-md-fence-language (lang)
+    "Return the Markdown info string for Org babel LANG."
+    (or (cdr (assoc lang gn/org-md-language-alist)) lang))
+
+  (defun gn/org-md-src-block (src-block _contents info)
+    "Transcode SRC-BLOCK into a fenced Markdown code block."
+    (let ((lang (org-element-property :language src-block))
+          (code (org-export-format-code-default src-block info)))
+      (format "```%s\n%s```"
+              (if lang (gn/org-md-fence-language lang) "")
+              (if (string-suffix-p "\n" code) code (concat code "\n")))))
+
+  (defun gn/org-md-example-block (example-block _contents info)
+    "Transcode EXAMPLE-BLOCK into an unlabelled fenced code block."
+    (let ((code (org-export-format-code-default example-block info)))
+      (format "```\n%s```"
+              (if (string-suffix-p "\n" code) code (concat code "\n")))))
+
+  (with-eval-after-load 'ox-md
+    (advice-add 'org-md-example-block :override
+                (lambda (element contents info)
+                  (if (eq (org-element-type element) 'src-block)
+                      (gn/org-md-src-block element contents info)
+                    (gn/org-md-example-block element contents info)))
+                '((name . gn/org-md-fenced-blocks))))
 #+end_src
 
 
@@ -1221,6 +1269,8 @@ Launch it as a detached process instead.
   ;; Set local indentation to 2 spaces for both TS and TSX
   (setq typescript-ts-mode-indent-offset 2)
 
+  (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode))
+
   ;; Apply 2-space indentation and match it for Eglot
   (add-hook 'typescript-ts-mode-hook
             (lambda ()
@@ -1228,6 +1278,18 @@ Launch it as a detached process instead.
   (add-hook 'tsx-ts-mode-hook
             (lambda ()
               (setq-local tab-width 2)))
+
+  ;; Start the LSP server (typescript-language-server) automatically
+  (add-hook 'typescript-ts-mode-hook #'eglot-ensure)
+  (add-hook 'tsx-ts-mode-hook #'eglot-ensure)
+
+  (defun gene/ts-eglot-setup ()
+    "Buffer-local Eglot behaviour for TypeScript buffers."
+    ;; TODO(human): decide what should happen on save in TS/TSX buffers.
+    )
+
+  (add-hook 'typescript-ts-mode-hook #'gene/ts-eglot-setup)
+  (add-hook 'tsx-ts-mode-hook #'gene/ts-eglot-setup)
 #+end_src
 
 
