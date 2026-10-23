@@ -293,6 +293,15 @@ Hydra
 
     (load-theme 'doom-one t)
 
+    ;; Emacs 31 flipped the gnus-group-news-low/-empty inheritance direction;
+    ;; doom-themes still uses the old one, so the two faces form an inheritance
+    ;; cycle that errors on every new frame (breaks corfu's child frames).
+    ;; This has to overwrite doom-one's own spec rather than shadow it with a
+    ;; user face: `face-spec-recalc' applies every theme's spec in turn, so a
+    ;; cyclic spec still errors even when a later one wins.
+    (custom-theme-set-faces 'doom-one
+     '(gnus-group-news-low-empty ((t (:inherit gnus-group-mail-1 :weight normal)))))
+
     ;; Enable flashing mode-line on errors
     (doom-themes-visual-bell-config)
     ;; or for treemacs users
@@ -522,6 +531,11 @@ Tempel
 Be sure to have a spell checking tool installed. This configuration assumes that [[http://aspell.net/][Aspell]] is installed.
 #+begin_src emacs-lisp :tangle yes :results none
   (setq ispell-program-name "aspell")
+
+  ;; `ispell-completion-at-point' (added buffer-locally by `text-mode') needs a
+  ;; plain word list, not aspell.  Its default is computed at load time from a
+  ;; fixed list of paths, so point it at the `words' package explicitly.
+  (setq ispell-alternate-dictionary "/usr/share/dict/words")
 #+end_src
 
 * Modes
